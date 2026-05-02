@@ -1,0 +1,4355 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trockenbau Wündrich – Arbeitsportal</title>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyBEOFj0B8CP6scwYoTWZgqtg6iciDCKZEE",
+  authDomain:        "trockenbau-wuendrich.firebaseapp.com",
+  databaseURL:       "https://trockenbau-wuendrich-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "trockenbau-wuendrich",
+  storageBucket:     "trockenbau-wuendrich.firebasestorage.app",
+  messagingSenderId: "253585482806",
+  appId:             "1:253585482806:web:5cd7a830b5fb28cd7a2497"
+};
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:15px;background:#f4f4f5;color:#111}
+input,select,textarea,button{font-family:inherit;font-size:14px;border-radius:8px;outline:none}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;background:#fff;color:#111}
+input:focus,select:focus,textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+button{padding:9px 18px;border:1px solid #ddd;background:#fff;color:#111;cursor:pointer;font-weight:500;transition:background .15s}
+button:hover{background:#f0f0f0}
+button:disabled{opacity:.4;cursor:not-allowed}
+.btn-blue{background:#2563eb;color:#fff;border-color:#2563eb}
+.btn-blue:hover{background:#1d4ed8}
+.btn-green{background:#16a34a;color:#fff;border-color:#16a34a}
+.btn-green:hover{background:#15803d}
+.btn-amber{background:#d97706;color:#fff;border-color:#d97706}
+.btn-amber:hover{background:#b45309}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px}
+.lbl{display:block;font-size:12px;color:#6b7280;margin-bottom:4px;font-weight:500}
+.sep{border:none;border-top:1px solid #e5e7eb;margin:20px 0}
+.badge-amber{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#fef3c7;color:#92400e}
+.badge-blue{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#dbeafe;color:#1e40af}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;color:#374151}
+.tab-bar{display:flex;overflow-x:auto;border-bottom:1px solid #e5e7eb;background:#fff}
+.tab-btn{padding:11px 14px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:#6b7280;font-size:13px;font-weight:500;white-space:nowrap;border-radius:0}
+.tab-btn.active{border-bottom-color:#2563eb;color:#2563eb}
+.pos-table{width:100%;border-collapse:collapse;font-size:13px}
+.pos-table th{padding:6px 8px;font-weight:600;color:#374151;background:#f9fafb;border-bottom:2px solid #e5e7eb;font-size:12px}
+.pos-table th:first-child,.pos-table th:nth-child(2){text-align:left}
+.pos-table th:not(:first-child):not(:nth-child(2)){text-align:right}
+.pos-table td{padding:5px 7px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.cell-input{width:100%;border:none;background:transparent;font-size:13px;padding:2px 4px;border-radius:4px}
+.cell-input:focus{background:#f0f7ff;outline:1px solid #93c5fd}
+.total-col{text-align:right;font-weight:600;color:#2563eb;font-variant-numeric:tabular-nums}
+.muted{color:#9ca3af;font-size:12px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:14px}
+.sum-row.bold{font-weight:600}
+.sum-row.top{border-top:1px solid #e5e7eb;padding-top:8px;margin-top:4px}
+.sum-final{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #111;padding-top:10px;margin-top:6px;font-size:17px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+.alert-blue{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;font-size:13px;color:#1e40af}
+.alert-amber{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:10px 14px;font-size:13px;color:#92400e}
+.spinner{width:16px;height:16px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mic-btn{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:transform .1s}
+.mic-btn:active{transform:scale(.94)}
+.mic-idle{background:#dbeafe}
+.mic-rec{background:#fee2e2;animation:pulse 1s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px #fca5a5}50%{box-shadow:0 0 0 8px #fecaca}}
+.hour-picker{display:flex;align-items:center;gap:24px;justify-content:center;padding:20px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb}
+.hour-btn{width:52px;height:52px;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;padding:0}
+.hour-num{font-size:52px;font-weight:700;color:#d97706;line-height:1}
+.portal-btn{padding:22px 20px;border-radius:14px;cursor:pointer;text-align:left;width:100%;border:1px solid;transition:transform .1s,box-shadow .1s}
+.portal-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.stat-card{background:#f9fafb;border-radius:10px;padding:14px 16px}
+.ai-out{white-space:pre-wrap;font-family:monospace;font-size:12.5px;line-height:1.7;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;max-height:400px;overflow-y:auto}
+.voice-note{background:#eff6ff;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:7px 10px;font-size:13px;color:#1e40af;margin-top:8px}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+
+// ── Firebase ──────────────────────────────────────────────────────────────
+let db = null,
+  fbOk = false;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+  fbOk = FIREBASE_CONFIG.apiKey !== "HIER_API_KEY_EINTRAGEN";
+} catch (e) {}
+async function fbGet(p, fb) {
+  try {
+    const s = await db.ref(p).get();
+    return s.exists() ? JSON.parse(s.val()) : fb;
+  } catch {
+    return fb;
+  }
+}
+async function fbSet(p, v) {
+  try {
+    await db.ref(p).set(JSON.stringify(v));
+  } catch {}
+}
+function fbListen(p, cb, fb) {
+  if (!fbOk) {
+    cb(fb);
+    return () => {};
+  }
+  const ref = db.ref(p);
+  const h = s => cb(s.exists() ? JSON.parse(s.val()) : fb);
+  ref.on("value", h);
+  return () => ref.off("value", h);
+}
+
+// ── AI ────────────────────────────────────────────────────────────────────
+async function callAI(prompt, max = 1800) {
+  var _d$content;
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: max,
+      messages: [{
+        role: "user",
+        content: prompt
+      }]
+    })
+  });
+  const d = await r.json();
+  return ((_d$content = d.content) === null || _d$content === void 0 || (_d$content = _d$content[0]) === null || _d$content === void 0 ? void 0 : _d$content.text) || "Fehler.";
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const toDay = () => new Date().toISOString().split("T")[0];
+const now0 = () => new Date().toISOString();
+const fmtD = d => {
+  if (!d) return "";
+  const [y, m, day] = d.split("-");
+  return `${day}.${m}.${y}`;
+};
+const fmtT = ts => ts ? new Date(ts).toLocaleTimeString("de-DE", {
+  hour: "2-digit",
+  minute: "2-digit"
+}) : "";
+const fmtE = n => n == null ? "–" : n.toLocaleString("de-DE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+}) + " €";
+const UNITS = ["h", "m²", "m", "Stk.", "kg", "l", "Pkg.", "Pal.", "Sack", "pschl.", "Rolle", "Eimer", "lfdm"];
+const ACTS = ["Unterkonstruktion setzen", "Rigipsplatten montieren", "Dämmung einbauen", "Verspachteln & Glätten", "Schleifen", "Grundierung", "Trockenbau-Wände", "Deckenverkleidung", "Brandschutz", "Materialtransport", "Aufmaß & Vermessung", "Reinigung", "Sonstiges"];
+const CO0 = {
+  name: "Trockenbau Wündrich GmbH",
+  header: "TW Trockenbau - Akustik - Meisterbetrieb",
+  street: "Franz-Mehring-Str. 22",
+  zip: "04157",
+  city: "Leipzig",
+  phone: "0341 8639951",
+  mobile: "0177 3816159",
+  email: "info@trockenbau-wuendrich.de",
+  website: "www.trockenbau-wuendrich.de",
+  manager: "Maik Wündrich",
+  hrb: "HRB 18225 Leipzig",
+  stNr: "232 121 04116",
+  bank: "Commerzbank Leipzig",
+  bic: "COBADEFFXXX",
+  iban: "DE64 860400000371531500"
+};
+
+// ── App ───────────────────────────────────────────────────────────────────
+function App() {
+  const [page, setPage] = useState("home");
+  const [workers, setW] = useState([{
+    id: "1",
+    name: "Max Mustermann"
+  }, {
+    id: "2",
+    name: "Hans Schmidt"
+  }]);
+  const [projects, setP] = useState([{
+    id: "1",
+    name: "Büro Leipzig",
+    client: "Müller GmbH",
+    address: "Hauptstr. 1, 04109 Leipzig",
+    trade: "Trockenbau"
+  }]);
+  const [entries, setE] = useState([]);
+  const [mats, setM] = useState([]);
+  const [pin, setPin] = useState("1234");
+  const [co, setCo] = useState(CO0);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (!fbOk) {
+      setReady(true);
+      return;
+    }
+    Promise.all([fbGet("tw_w", [{
+      id: "1",
+      name: "Max Mustermann"
+    }]), fbGet("tw_p", [{
+      id: "1",
+      name: "Büro Leipzig",
+      client: "Müller GmbH",
+      address: "Hauptstr. 1",
+      trade: "Trockenbau"
+    }]), fbGet("tw_pin", "1234"), fbGet("tw_co", CO0)]).then(([w, p, pin, co]) => {
+      setW(w);
+      setP(p);
+      setPin(pin);
+      setCo(co);
+      setReady(true);
+    });
+    const offE = fbListen("tw_e", v => setE(v || []), []);
+    const offM = fbListen("tw_m", v => setM(v || []), []);
+    return () => {
+      offE();
+      offM();
+    };
+  }, []);
+  const sw = async v => {
+    setW(v);
+    await fbSet("tw_w", v);
+  };
+  const sp = async v => {
+    setP(v);
+    await fbSet("tw_p", v);
+  };
+  const se = async v => {
+    setE(v);
+    await fbSet("tw_e", v);
+  };
+  const sm = async v => {
+    setM(v);
+    await fbSet("tw_m", v);
+  };
+  const sPin = async v => {
+    setPin(v);
+    await fbSet("tw_pin", v);
+  };
+  const sCo = async v => {
+    setCo(v);
+    await fbSet("tw_co", v);
+  };
+  if (!ready) return /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "2rem",
+      color: "#6b7280"
+    }
+  }, "Verbinde mit Firebase\u2026");
+  const pr = {
+    workers,
+    projects,
+    entries,
+    mats,
+    sw,
+    sp,
+    se,
+    sm,
+    pin,
+    sPin,
+    co,
+    sCo,
+    setPage
+  };
+  return page === "home" ? /*#__PURE__*/React.createElement(Home, {
+    setPage: setPage,
+    co: co
+  }) : page === "worker" ? /*#__PURE__*/React.createElement(WorkerPortal, pr) : /*#__PURE__*/React.createElement(CompanyPortal, pr);
+}
+
+// ── Home ──────────────────────────────────────────────────────────────────
+function Home({
+  setPage,
+  co
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 500,
+      margin: "0 auto",
+      padding: "2rem 1rem"
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "11px",
+      textTransform: "uppercase",
+      letterSpacing: "1.5px",
+      color: "#9ca3af",
+      marginBottom: 4
+    }
+  }, co.name), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: "22px",
+      fontWeight: 700,
+      marginBottom: "2rem"
+    }
+  }, "Digitales Arbeitsportal"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "portal-btn",
+    onClick: () => setPage("worker"),
+    style: {
+      background: "#fffbeb",
+      borderColor: "#fcd34d"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "18px",
+      fontWeight: 600,
+      color: "#92400e",
+      marginBottom: 4
+    }
+  }, "Arbeitnehmer-Portal"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "13px",
+      color: "#92400e",
+      opacity: .75
+    }
+  }, "Stunden melden \xB7 Sprachaufnahme \xB7 T\xE4tigkeitsnachweis")), /*#__PURE__*/React.createElement("button", {
+    className: "portal-btn",
+    onClick: () => setPage("company"),
+    style: {
+      background: "#eff6ff",
+      borderColor: "#bfdbfe"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "18px",
+      fontWeight: 600,
+      color: "#1e40af",
+      marginBottom: 4
+    }
+  }, "Unternehmensportal"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "13px",
+      color: "#1e40af",
+      opacity: .75
+    }
+  }, "Rechnungen \xB7 Angebote \xB7 Berichte \xB7 Verwaltung"))));
+}
+
+// ── VoiceBox ──────────────────────────────────────────────────────────────
+function VoiceBox({
+  value,
+  onChange,
+  onTranslation,
+  translation
+}) {
+  const [rec, setRec] = useState(false);
+  const [err, setErr] = useState("");
+  const [translating, setTranslating] = useState(false);
+  const [lang, setLang] = useState("");
+  const ref = useRef(null);
+  const finalRef = useRef("");
+  const detectAndTranslate = async text => {
+    if (!text.trim() || text.length < 5) return;
+    const plChars = /[ąęóśźżćńĄĘÓŚŹŻĆŃ]/;
+    if (!plChars.test(text)) {
+      setLang("de");
+      return;
+    }
+    setLang("pl");
+    setTranslating(true);
+    try {
+      const t = await callAI(`Übersetze kurz ins Deutsche, nur Übersetzung:\n"${text}"`, 200);
+      if (t && onTranslation) onTranslation(t);
+    } catch {}
+    setTranslating(false);
+  };
+  const start = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      setErr("Chrome empfohlen – bitte Text eingeben.");
+      return;
+    }
+    try {
+      const r = new SR();
+      r.lang = "";
+      r.continuous = true;
+      r.interimResults = true;
+      finalRef.current = value || "";
+      let fin = value || "";
+      r.onresult = e => {
+        let im = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) fin = (fin ? fin + " " : "") + e.results[i][0].transcript.trim();else im += e.results[i][0].transcript;
+        }
+        finalRef.current = fin;
+        onChange(fin + (im ? " " + im : ""));
+      };
+      r.onerror = e => {
+        setErr(e.error === "not-allowed" ? "Mikrofon verweigert." : "Fehler.");
+        setRec(false);
+      };
+      r.onend = () => {
+        setRec(false);
+        detectAndTranslate(finalRef.current);
+      };
+      r.start();
+      ref.current = r;
+      setRec(true);
+      setErr("");
+      setLang("");
+      if (onTranslation) onTranslation("");
+    } catch {
+      setErr("Nicht verfügbar.");
+    }
+  };
+  const stop = () => {
+    var _ref$current;
+    (_ref$current = ref.current) === null || _ref$current === void 0 || _ref$current.stop();
+    ref.current = null;
+    setRec(false);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `mic-btn ${rec ? "mic-rec" : "mic-idle"}`,
+    onClick: rec ? stop : start
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "26",
+    height: "26",
+    viewBox: "0 0 24 24",
+    fill: "none"
+  }, rec ? /*#__PURE__*/React.createElement("rect", {
+    x: "6",
+    y: "6",
+    width: "12",
+    height: "12",
+    rx: "2",
+    fill: "#dc2626"
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+    x: "9",
+    y: "2",
+    width: "6",
+    height: "12",
+    rx: "3",
+    fill: "#1d4ed8"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M5 11v1a7 7 0 0014 0v-1",
+    stroke: "#1d4ed8",
+    strokeWidth: "2.5",
+    strokeLinecap: "round"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "12",
+    y1: "19",
+    x2: "12",
+    y2: "22",
+    stroke: "#1d4ed8",
+    strokeWidth: "2.5",
+    strokeLinecap: "round"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "9",
+    y1: "22",
+    x2: "15",
+    y2: "22",
+    stroke: "#1d4ed8",
+    strokeWidth: "2",
+    strokeLinecap: "round"
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      fontSize: "13px",
+      fontWeight: 500,
+      color: rec ? "#dc2626" : "#6b7280"
+    }
+  }, rec ? "● Aufnahme läuft – nochmal tippen zum Stopp" : "Tippen und sprechen"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af",
+      marginTop: 3
+    }
+  }, "Deutsch oder Polski \u2014 wird automatisch erkannt")), err && /*#__PURE__*/React.createElement("div", {
+    className: "alert-amber",
+    style: {
+      marginBottom: 10
+    }
+  }, err), /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, lang === "pl" ? "🇵🇱 Polnisch" : lang === "de" ? "🇩🇪 Deutsch" : "Aufzeichnung", " ", rec ? "(live)" : ""), /*#__PURE__*/React.createElement("textarea", {
+    value: value || "",
+    onChange: e => onChange(e.target.value),
+    placeholder: "Sprechen oder eintippen\u2026",
+    rows: 3,
+    style: {
+      resize: "vertical"
+    }
+  }), lang === "pl" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "\uD83C\uDDE9\uD83C\uDDEA \xDCbersetzung ", translating ? /*#__PURE__*/React.createElement("span", {
+    className: "spinner"
+  }) : ""), /*#__PURE__*/React.createElement("textarea", {
+    value: translation || "",
+    onChange: e => onTranslation && onTranslation(e.target.value),
+    placeholder: translating ? "Wird übersetzt…" : "Übersetzung erscheint hier…",
+    rows: 3,
+    style: {
+      resize: "vertical",
+      background: "#f0fdf4",
+      borderColor: "#86efac"
+    }
+  })));
+}
+
+// ── Worker Portal ─────────────────────────────────────────────────────────
+function WorkerPortal({
+  workers,
+  projects,
+  entries,
+  se,
+  setPage
+}) {
+  const [wId, setWId] = useState("");
+  const [step, setStep] = useState(0);
+  const [f, setF] = useState({
+    pId: "",
+    date: toDay(),
+    hours: 0,
+    timeFrom: "",
+    timeTo: "",
+    voice: "",
+    voiceDe: "",
+    acts: []
+  });
+  const [translation, setTranslation] = useState("");
+  const w = workers.find(x => x.id === wId),
+    p = projects.find(x => x.id === f.pId);
+  const myE = [...entries].filter(e => e.workerName === (w === null || w === void 0 ? void 0 : w.name)).sort((a, b) => (b.ts || "").localeCompare(a.ts || "")).slice(0, 8);
+  const tog = a => setF(x => ({
+    ...x,
+    acts: x.acts.includes(a) ? x.acts.filter(b => b !== a) : [...x.acts, a]
+  }));
+  const back = () => step > 1 ? setStep(s => s - 1) : step === 1 ? (setStep(0), setF({
+    pId: "",
+    date: toDay(),
+    hours: 8,
+    voice: "",
+    voiceDe: "",
+    acts: []
+  })) : setPage("home");
+  const submit = async () => {
+    const fahrzeitMin = parseFloat(p === null || p === void 0 ? void 0 : p.fahrzeit) || 0;
+    const fahrzeitH = Math.round(fahrzeitMin * 4) / 4;
+    const totalHours = +(f.hours + fahrzeitH).toFixed(2);
+    await se([...entries, {
+      id: uid(),
+      workerName: (w === null || w === void 0 ? void 0 : w.name) || "",
+      projectId: f.pId,
+      projectName: (p === null || p === void 0 ? void 0 : p.name) || "",
+      date: f.date,
+      hours: totalHours,
+      arbeitH: f.hours,
+      fahrzeitH,
+      timeFrom: f.timeFrom,
+      timeTo: f.timeTo,
+      voice: f.voice,
+      voiceDe: f.voiceDe,
+      acts: f.acts,
+      ts: now0()
+    }]);
+    setTranslation("");
+    setStep(3);
+  };
+  const hdr = /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1rem 1.25rem",
+      borderBottom: "1px solid #e5e7eb",
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: back,
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#6b7280",
+      fontSize: "16px",
+      padding: 0
+    }
+  }, "\u2190"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af",
+      textTransform: "uppercase",
+      letterSpacing: "1px"
+    }
+  }, "Arbeitnehmer-Portal"), w && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "15px",
+      fontWeight: 600
+    }
+  }, w.name)), step > 0 && step < 3 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 5
+    }
+  }, [1, 2].map(n => /*#__PURE__*/React.createElement("div", {
+    key: n,
+    style: {
+      width: 24,
+      height: 3,
+      borderRadius: 2,
+      background: step >= n ? "#d97706" : "#e5e7eb"
+    }
+  }))));
+  if (step === 3) return /*#__PURE__*/React.createElement("div", null, hdr, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 480,
+      margin: "0 auto",
+      padding: "3rem 1rem",
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 56,
+      height: 56,
+      borderRadius: "50%",
+      background: "#dcfce7",
+      border: "1px solid #86efac",
+      margin: "0 auto 1.5rem",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "24",
+    height: "24",
+    viewBox: "0 0 24 24",
+    fill: "none"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M5 12l5 5L19 7",
+    stroke: "#16a34a",
+    strokeWidth: "2.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }))), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "20px",
+      fontWeight: 700,
+      marginBottom: 8
+    }
+  }, "Eingetragen!"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#6b7280",
+      marginBottom: "1.5rem"
+    }
+  }, f.hours, " Stunden \xB7 ", p === null || p === void 0 ? void 0 : p.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      setF({
+        pId: "",
+        date: toDay(),
+        hours: 0,
+        timeFrom: "",
+        timeTo: "",
+        voice: "",
+        voiceDe: "",
+        acts: []
+      });
+      setStep(1);
+    }
+  }, "Nochmal"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setStep(0)
+  }, "Meine Eintr\xE4ge"))));
+  return /*#__PURE__*/React.createElement("div", null, hdr, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 480,
+      margin: "0 auto",
+      padding: "1.5rem 1rem"
+    }
+  }, step === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "20px",
+      fontWeight: 700,
+      marginBottom: "1.25rem"
+    }
+  }, "Wer bist du?"), /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Name w\xE4hlen"), /*#__PURE__*/React.createElement("select", {
+    value: wId,
+    onChange: e => setWId(e.target.value),
+    style: {
+      fontSize: "16px",
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 ausw\xE4hlen \u2014"), workers.map(w => /*#__PURE__*/React.createElement("option", {
+    key: w.id,
+    value: w.id
+  }, w.name))), wId && /*#__PURE__*/React.createElement("button", {
+    className: "btn-amber",
+    onClick: () => setStep(1),
+    style: {
+      width: "100%",
+      padding: "14px",
+      fontSize: "15px"
+    }
+  }, "Weiter zu Stunden eintragen \u2192"), wId && myE.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("hr", {
+    className: "sep"
+  }), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Meine letzten Eintr\xE4ge"), myE.map(e => /*#__PURE__*/React.createElement("div", {
+    key: e.id,
+    className: "card",
+    style: {
+      marginBottom: 7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      fontSize: "14px"
+    }
+  }, e.projectName), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, fmtD(e.date), " \xB7 ", fmtT(e.ts), " Uhr")), /*#__PURE__*/React.createElement("span", {
+    className: "badge-amber"
+  }, e.hours, "h")), (e.voiceDe || e.voice) && /*#__PURE__*/React.createElement("div", {
+    className: "voice-note"
+  }, (e.voiceDe || e.voice).slice(0, 90)))))), step === 1 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "20px",
+      fontWeight: 700,
+      marginBottom: 4
+    }
+  }, "Wann & wo?"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#6b7280",
+      fontSize: "13px",
+      marginBottom: "1.25rem"
+    }
+  }, w === null || w === void 0 ? void 0 : w.name), /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Baustelle"), /*#__PURE__*/React.createElement("select", {
+    value: f.pId,
+    onChange: e => setF(x => ({
+      ...x,
+      pId: e.target.value
+    })),
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 w\xE4hlen \u2014"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name))), /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Datum & Uhrzeit (Nachweis-Zeitstempel)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#f0fdf4",
+      border: "1px solid #86efac",
+      borderRadius: 10,
+      padding: "12px 16px",
+      marginBottom: "1rem",
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "20",
+    height: "20",
+    viewBox: "0 0 24 24",
+    fill: "none"
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: "12",
+    cy: "12",
+    r: "10",
+    stroke: "#16a34a",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M12 6v6l4 2",
+    stroke: "#16a34a",
+    strokeWidth: "2",
+    strokeLinecap: "round"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 700,
+      fontSize: "16px",
+      color: "#166534"
+    }
+  }, fmtD(f.date)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#16a34a"
+    }
+  }, new Date().toLocaleTimeString("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit"
+  }), " Uhr automatisch gespeichert"))), /*#__PURE__*/React.createElement("details", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("summary", {
+    style: {
+      fontSize: "12px",
+      color: "#9ca3af",
+      cursor: "pointer"
+    }
+  }, "Datum nachtraglich andern"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: f.date,
+    onChange: e => setF(x => ({
+      ...x,
+      date: e.target.value
+    })),
+    style: {
+      marginTop: 6
+    }
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Arbeitszeit (von/bis)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      alignItems: "flex-end",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl",
+    style: {
+      fontSize: "11px"
+    }
+  }, "Von"), /*#__PURE__*/React.createElement("input", {
+    type: "time",
+    value: f.timeFrom || "",
+    onChange: e => {
+      const from = e.target.value;
+      setF(x => {
+        const to = x.timeTo || "";
+        let hrs = x.hours;
+        if (from && to) {
+          const [fh, fm] = from.split(":").map(Number);
+          const [th, tm] = to.split(":").map(Number);
+          let d = th * 60 + tm - (fh * 60 + fm);
+          if (d < 0) d += 1440;
+          hrs = Math.round(d / 15) * 0.25;
+        }
+        return {
+          ...x,
+          timeFrom: from,
+          hours: hrs
+        };
+      });
+    },
+    style: {
+      fontSize: "18px",
+      fontWeight: 600
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl",
+    style: {
+      fontSize: "11px"
+    }
+  }, "Bis"), /*#__PURE__*/React.createElement("input", {
+    type: "time",
+    value: f.timeTo || "",
+    onChange: e => {
+      const to = e.target.value;
+      setF(x => {
+        const from = x.timeFrom || "";
+        let hrs = x.hours;
+        if (from && to) {
+          const [fh, fm] = from.split(":").map(Number);
+          const [th, tm] = to.split(":").map(Number);
+          let d = th * 60 + tm - (fh * 60 + fm);
+          if (d < 0) d += 1440;
+          hrs = Math.round(d / 15) * 0.25;
+        }
+        return {
+          ...x,
+          timeTo: to,
+          hours: hrs
+        };
+      });
+    },
+    style: {
+      fontSize: "18px",
+      fontWeight: 600
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      minWidth: 64,
+      paddingBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "26px",
+      fontWeight: 700,
+      color: "#d97706"
+    }
+  }, f.hours), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af"
+    }
+  }, "Std."))), f.timeFrom && f.timeTo && f.hours > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#16a34a",
+      marginBottom: "1rem",
+      padding: "8px 12px",
+      background: "#f0fdf4",
+      borderRadius: 8,
+      lineHeight: 1.6
+    }
+  }, f.timeFrom, " bis ", f.timeTo, " Uhr = ", /*#__PURE__*/React.createElement("strong", null, f.hours, " Std. Arbeitszeit"), (p === null || p === void 0 ? void 0 : p.fahrzeit) && parseFloat(p.fahrzeit) > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#6b7280"
+    }
+  }, "+ ", p.fahrzeit, " Std. An-/Abfahrt = "), /*#__PURE__*/React.createElement("strong", {
+    style: {
+      color: "#d97706"
+    }
+  }, +(f.hours + Math.round(parseFloat(p.fahrzeit) * 4) / 4).toFixed(2), " Std. gesamt"))), /*#__PURE__*/React.createElement("details", null, /*#__PURE__*/React.createElement("summary", {
+    style: {
+      fontSize: "12px",
+      color: "#9ca3af",
+      cursor: "pointer",
+      marginBottom: 8
+    }
+  }, "Stunden manuell anpassen"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 16,
+      padding: "8px 0",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "hour-btn",
+    onClick: () => setF(x => ({
+      ...x,
+      hours: +Math.max(.25, x.hours - .25).toFixed(2)
+    }))
+  }, "-"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "22px",
+      fontWeight: 700,
+      color: "#d97706"
+    }
+  }, f.hours), /*#__PURE__*/React.createElement("button", {
+    className: "hour-btn",
+    onClick: () => setF(x => ({
+      ...x,
+      hours: +Math.min(24, x.hours + .25).toFixed(2)
+    }))
+  }, "+"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginTop: "1.25rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: back,
+    style: {
+      flex: 1
+    }
+  }, "\u2190 Zur\xFCck"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-amber",
+    onClick: () => setStep(2),
+    disabled: !f.pId,
+    style: {
+      flex: 2,
+      padding: "13px"
+    }
+  }, "Weiter \u2192"))), step === 2 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "20px",
+      fontWeight: 700,
+      marginBottom: 4
+    }
+  }, "Was wurde gemacht?"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#6b7280",
+      fontSize: "13px",
+      marginBottom: "1.25rem"
+    }
+  }, p === null || p === void 0 ? void 0 : p.name, " \xB7 ", fmtD(f.date)), /*#__PURE__*/React.createElement(VoiceBox, {
+    value: f.voice,
+    onChange: v => setF(x => ({
+      ...x,
+      voice: v
+    })),
+    translation: translation,
+    onTranslation: t => {
+      setTranslation(t);
+      setF(x => ({
+        ...x,
+        voiceDe: t
+      }));
+    }
+  }), /*#__PURE__*/React.createElement("details", {
+    style: {
+      marginTop: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("summary", {
+    style: {
+      fontSize: "13px",
+      color: "#6b7280",
+      cursor: "pointer",
+      userSelect: "none",
+      padding: "6px 0",
+      fontWeight: 500
+    }
+  }, "Schnellauswahl T\xE4tigkeiten ", f.acts.length ? "(" + f.acts.length + " gewählt)" : ""), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: ".75rem",
+      display: "flex",
+      flexDirection: "column",
+      gap: 5
+    }
+  }, ACTS.map(a => {
+    const s = f.acts.includes(a);
+    return /*#__PURE__*/React.createElement("button", {
+      key: a,
+      onClick: () => tog(a),
+      style: {
+        padding: "9px 14px",
+        textAlign: "left",
+        background: s ? "#fef3c7" : "#f9fafb",
+        border: s ? "1px solid #fcd34d" : "1px solid #e5e7eb",
+        borderRadius: 8,
+        cursor: "pointer",
+        color: s ? "#92400e" : "#374151",
+        fontSize: "13px",
+        display: "flex",
+        alignItems: "center",
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: "14px"
+      }
+    }, s ? "☑" : "☐"), a);
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginTop: "1.5rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setStep(1),
+    style: {
+      flex: 1
+    }
+  }, "\u2190 Zur\xFCck"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-amber",
+    onClick: submit,
+    disabled: !f.voice.trim() && !f.acts.length || f.hours <= 0,
+    style: {
+      flex: 2,
+      padding: "13px"
+    }
+  }, "Absenden")))));
+}
+
+// ── Company Portal ────────────────────────────────────────────────────────
+function CompanyPortal({
+  workers,
+  projects,
+  entries,
+  mats,
+  sw,
+  sp,
+  se,
+  sm,
+  pin,
+  sPin,
+  co,
+  sCo,
+  setPage
+}) {
+  const [authed, setAuthed] = useState(false);
+  const [pinIn, setPinIn] = useState("");
+  const [pinErr, setPinErr] = useState(false);
+  const [tab, setTab] = useState("dash");
+  const login = () => {
+    if (pinIn === pin) setAuthed(true);else {
+      setPinErr(true);
+      setTimeout(() => setPinErr(false), 800);
+    }
+  };
+  if (!authed) return /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 360,
+      margin: "0 auto",
+      padding: "2rem 1rem",
+      paddingTop: "4rem"
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "11px",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+      color: "#9ca3af",
+      marginBottom: 4
+    }
+  }, "Unternehmensportal"), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "20px",
+      fontWeight: 700,
+      marginBottom: "1.5rem"
+    }
+  }, "PIN-Anmeldung"), /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    value: pinIn,
+    onChange: e => setPinIn(e.target.value),
+    onKeyDown: e => e.key === "Enter" && login(),
+    placeholder: "PIN",
+    style: {
+      textAlign: "center",
+      fontSize: "22px",
+      letterSpacing: "8px",
+      background: pinErr ? "#fee2e2" : undefined
+    }
+  }), pinErr && /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#dc2626",
+      fontSize: "12px",
+      marginTop: 5
+    }
+  }, "Falscher PIN"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: login,
+    style: {
+      flex: 1
+    }
+  }, "Einloggen"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setPage("home")
+  }, "Zur\xFCck")));
+  const TABS = [["dash", "Übersicht"], ["entries", "Einträge"], ["mats", "Materialien"], ["invoice", "Rechnungen"], ["ruecklauf", "Rücklauf"], ["quote", "Angebot"], ["report", "Leistungsnachweis"], ["settings", "Einstellungen"]];
+  const pr = {
+    workers,
+    projects,
+    entries,
+    mats,
+    sw,
+    sp,
+    se,
+    sm,
+    pin,
+    sPin,
+    co,
+    sCo
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#fff",
+      borderBottom: "1px solid #e5e7eb"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 1.25rem 0",
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setPage("home"),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#6b7280",
+      fontSize: "15px",
+      padding: "0 0 10px"
+    }
+  }, "\u2190"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      paddingBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "10px",
+      color: "#9ca3af",
+      textTransform: "uppercase",
+      letterSpacing: "1px"
+    }
+  }, "Unternehmensportal"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600
+    }
+  }, co.name))), /*#__PURE__*/React.createElement("div", {
+    className: "tab-bar"
+  }, TABS.map(([k, l]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    className: `tab-btn ${tab === k ? "active" : ""}`,
+    onClick: () => setTab(k)
+  }, l)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.25rem 1rem",
+      maxWidth: 960,
+      margin: "0 auto"
+    }
+  }, tab === "dash" && /*#__PURE__*/React.createElement(Dashboard, pr), tab === "entries" && /*#__PURE__*/React.createElement(Entries, pr), tab === "mats" && /*#__PURE__*/React.createElement(Mats, pr), tab === "invoice" && /*#__PURE__*/React.createElement(Invoice, pr), tab === "ruecklauf" && /*#__PURE__*/React.createElement(Ruecklauf, {
+    projects: projects,
+    co: co
+  }), tab === "quote" && /*#__PURE__*/React.createElement(Quote, pr), tab === "report" && /*#__PURE__*/React.createElement(Report, pr), tab === "settings" && /*#__PURE__*/React.createElement(Settings, pr)));
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+function Dashboard({
+  entries,
+  projects,
+  mats,
+  workers
+}) {
+  const d = toDay(),
+    wk = new Date(Date.now() - 7 * 864e5).toISOString().split("T")[0];
+  const todH = entries.filter(e => e.date === d).reduce((s, e) => s + e.hours, 0);
+  const wkH = entries.filter(e => e.date >= wk).reduce((s, e) => s + e.hours, 0);
+  const recent = [...entries].sort((a, b) => (b.ts || "").localeCompare(a.ts || "")).slice(0, 8);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: "1rem"
+    }
+  }, "\xDCbersicht"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))",
+      gap: 10,
+      marginBottom: "1.5rem"
+    }
+  }, [["Stunden heute", todH + "h"], ["7 Tage", wkH + "h"], ["Mitarbeiter", workers.length], ["Baustellen", projects.length]].map(([l, v]) => /*#__PURE__*/React.createElement("div", {
+    key: l,
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280",
+      marginBottom: 3
+    }
+  }, l), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "24px",
+      fontWeight: 700,
+      color: "#2563eb"
+    }
+  }, v)))), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Letzte Eintr\xE4ge"), recent.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#6b7280",
+      fontSize: "13px"
+    }
+  }, "Noch keine Eintr\xE4ge.") : recent.map(e => /*#__PURE__*/React.createElement("div", {
+    key: e.id,
+    className: "card",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      fontSize: "13px"
+    }
+  }, e.workerName), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, e.projectName, " \xB7 ", fmtD(e.date), e.timeFrom ? " · " + e.timeFrom + (e.timeTo ? "-" + e.timeTo + " Uhr" : "") : " · " + fmtT(e.ts) + " Uhr"), (e.voiceDe || e.voice) && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#6b7280",
+      marginTop: 2,
+      fontStyle: "italic"
+    }
+  }, (e.voiceDe || e.voice).slice(0, 70), "\u2026")), /*#__PURE__*/React.createElement("span", {
+    className: "badge-amber"
+  }, e.hours, "h")))));
+}
+
+// ── Entries ───────────────────────────────────────────────────────────────
+function Entries({
+  entries,
+  projects,
+  workers,
+  se
+}) {
+  const [fp, setFp] = useState("all");
+  const [fw, setFw] = useState("all");
+  const filt = [...entries].filter(e => (fp === "all" || e.projectId === fp) && (fw === "all" || e.workerName === fw)).sort((a, b) => (b.ts || "").localeCompare(a.ts || ""));
+  const totalH = filt.reduce((s, e) => s + e.hours, 0);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap",
+      alignItems: "center",
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      flex: 1
+    }
+  }, "Alle Eintr\xE4ge"), /*#__PURE__*/React.createElement("select", {
+    value: fp,
+    onChange: e => setFp(e.target.value),
+    style: {
+      width: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "Alle Baustellen"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name))), /*#__PURE__*/React.createElement("select", {
+    value: fw,
+    onChange: e => setFw(e.target.value),
+    style: {
+      width: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "Alle MA"), workers.map(w => /*#__PURE__*/React.createElement("option", {
+    key: w.id,
+    value: w.name
+  }, w.name))), /*#__PURE__*/React.createElement("span", {
+    className: "badge-amber"
+  }, totalH, " Std.")), filt.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: "#6b7280",
+      textAlign: "center",
+      padding: "2rem",
+      fontSize: "13px"
+    }
+  }, "Keine Eintr\xE4ge.") : filt.map(e => {
+    var _e$acts;
+    return /*#__PURE__*/React.createElement("div", {
+      key: e.id,
+      className: "card",
+      style: {
+        marginBottom: 7
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 10,
+        alignItems: "flex-start"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontWeight: 600,
+        fontSize: "13px"
+      }
+    }, e.workerName), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: "12px",
+        color: "#6b7280"
+      }
+    }, e.projectName, " \xB7 ", fmtD(e.date), " \xB7 ", fmtT(e.ts), " Uhr")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "right",
+        flexShrink: 0
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "badge-amber",
+      style: {
+        fontSize: "14px"
+      }
+    }, e.hours, "h"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("button", {
+      onClick: () => se(entries.filter(x => x.id !== e.id)),
+      style: {
+        background: "none",
+        border: "none",
+        color: "#dc2626",
+        cursor: "pointer",
+        fontSize: "11px",
+        padding: "2px 0"
+      }
+    }, "l\xF6schen")))), (e.voiceDe || e.voice) && /*#__PURE__*/React.createElement("div", {
+      className: "voice-note"
+    }, /*#__PURE__*/React.createElement("strong", null, fmtD(e.date), ", ", fmtT(e.ts), " Uhr:"), " ", e.voiceDe || e.voice, e.voiceDe && e.voiceDe !== e.voice && /*#__PURE__*/React.createElement("span", {
+      style: {
+        display: "block",
+        fontSize: "11px",
+        color: "#6b7280",
+        fontStyle: "italic",
+        marginTop: 2
+      }
+    }, "\uD83C\uDDF5\uD83C\uDDF1 ", e.voice)), ((_e$acts = e.acts) === null || _e$acts === void 0 ? void 0 : _e$acts.length) > 0 && /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 5,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 3
+      }
+    }, e.acts.map(a => /*#__PURE__*/React.createElement("span", {
+      key: a,
+      className: "tag"
+    }, a))));
+  }));
+}
+
+// ── Materials ─────────────────────────────────────────────────────────────
+function Mats({
+  mats,
+  projects,
+  sm
+}) {
+  const [pId, setPId] = useState("");
+  const [date, setDate] = useState(toDay());
+  const [supp, setSupp] = useState("");
+  const [dn, setDn] = useState("");
+  const [rows, setRows] = useState([{
+    desc: "",
+    qty: "1",
+    unit: "m²",
+    price: ""
+  }]);
+  const [fp, setFp] = useState("all");
+  const [saved, setSaved] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanMsg, setScanMsg] = useState("");
+  const [belegType, setBelegType] = useState("Lieferschein");
+  const fileRef = useRef(null);
+  const upd = (i, k, v) => setRows(r => r.map((x, j) => j === i ? {
+    ...x,
+    [k]: v
+  } : x));
+  const tot = rows.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
+  const parseTextToItems = text => {
+    let supplier = "",
+      dn = "";
+    const lines = text.split(/\n+/).map(l => l.trim()).filter(l => l.length > 1);
+
+    // Detect supplier
+    if (/rothkegel/i.test(text)) supplier = "Rothkegel";else if (/hornbach/i.test(text)) supplier = "Hornbach";else if (/bauhaus/i.test(text)) supplier = "Bauhaus";else if (/obi\b/i.test(text)) supplier = "OBI";
+
+    // Extract delivery note number
+    const dnMatch = text.match(/Lieferschein[-\s]?(?:Nr\.?|Nummer)[:\s]*([A-Z0-9\-\/]+)/i) || text.match(/KRE\s+(\d+)/i) || text.match(/Beleg\s+([A-Z]+\s*\d+)/i);
+    if (dnMatch) dn = dnMatch[1].trim();
+    const items = [];
+
+    // ── Rothkegel format ──────────────────────────────────────────────
+    // Pattern: "1 Artikelnummer: 0835070422   1,0   SET   9,58   9,58"
+    // Columns: Pos | ArtNr | Menge | Einheit | E.-Preis | Betrag
+    // For lfdm/Qm "pro 100 lfdm": E.-Preis is per 100 units, so divide by 100
+    const rokRe = /^(\d+)\s+Artikelnummer:\s+\d+\s+([\d,.]+)\s+(SET|lfdm|Qm|Sack|Eimer|Stück|Pack|Bd)\s+([\d,.]+)\s+([\d,.]+)/i;
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(rokRe);
+      if (m) {
+        const menge = parseFloat(m[2].replace(",", "."));
+        const rawUnit = m[3].toLowerCase();
+        const epRaw = parseFloat(m[4].replace(",", ".")); // E.-Preis column
+        // For lfdm and Qm: check if "pro 100" appears within next 3 lines
+        const nextLines = lines.slice(i, Math.min(i + 4, lines.length)).join(" ");
+        const isPer100 = nextLines.includes("pro 100");
+        const ep = isPer100 ? epRaw / 100 : epRaw;
+
+        // Description is next non-metadata line
+        let desc = "";
+        for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+          const l = lines[j];
+          if (!l.match(/^(Lagerort|Artikelnummer|\d+\s+Artikelnummer|Beleg|Übertrag|Seite|pro\s+100)/i)) {
+            desc = l.replace(/\s+/g, " ").trim();
+            break;
+          }
+        }
+        if (!desc) continue;
+        const unit = rawUnit === "qm" ? "m²" : rawUnit === "lfdm" ? "lfdm" : rawUnit === "sack" ? "Sack" : rawUnit === "eimer" ? "Eimer" : rawUnit === "set" ? "Stk." : rawUnit === "stück" ? "Stk." : rawUnit === "pack" ? "Pkg." : rawUnit === "bd" ? "Pkg." : "Stk.";
+        items.push({
+          desc,
+          qty: String(menge),
+          unit,
+          price: ep.toFixed(2)
+        });
+        continue;
+      }
+
+      // ── Hornbach Lieferschein format ──────────────────────────────
+      // "Lugato Bad-Silikon Wie Gummi steingrau 310 ml"
+      // "4009071098684   1 Stück"  (EAN + menge + unit)
+      const hornEanRe = /^(\d{8,14})\s+([\d,]+)\s+(Stück|lfdm|SET|Sack|Eimer|m²|Qm|Pkg\.?|kg|l)\b/i;
+      const hornM = lines[i].match(hornEanRe);
+      if (hornM && i > 0) {
+        const desc = lines[i - 1].trim();
+        if (desc.length > 3 && !desc.match(/^\d{8,}/)) {
+          const menge = parseFloat(hornM[2].replace(",", "."));
+          const rawUnit = hornM[3].toLowerCase();
+          const unit = rawUnit === "stück" ? "Stk." : rawUnit === "m²" || rawUnit === "qm" ? "m²" : rawUnit === "sack" ? "Sack" : rawUnit === "eimer" ? "Eimer" : rawUnit === "lfdm" ? "lfdm" : rawUnit === "set" ? "Stk." : "Stk.";
+          // Hornbach Lieferschein has no prices
+          items.push({
+            desc,
+            qty: String(menge),
+            unit,
+            price: ""
+          });
+        }
+        continue;
+      }
+    }
+
+    // ── Generic fallback: find lines with prices ───────────────────
+    if (items.length === 0) {
+      // Look for pattern: description + qty + unit + price OR description + price
+      const genericRe = /^(.{3,60?}?)\s+([\d]+[,.][\d]{2})\s*(?:€|EUR)?$/;
+      const priceOnlyRe = /([\d]{1,6}[,.][\d]{2})\s*(?:€|EUR)/g;
+      for (const line of lines) {
+        const gm = line.match(genericRe);
+        if (gm) {
+          const price = parseFloat(gm[2].replace(",", "."));
+          if (price > 0 && price < 50000) {
+            items.push({
+              desc: gm[1].trim(),
+              qty: "1",
+              unit: "pschl.",
+              price: price.toFixed(2)
+            });
+          }
+        }
+      }
+    }
+    return {
+      supplier,
+      dn,
+      belegType: /rechnung|KRE|RN\s*\d/i.test(text) ? "Rechnung" : "Lieferschein",
+      items
+    };
+  };
+  const extractPDFText = async file => {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const pdfjsLib = window['pdfjs-dist/build/pdf'];
+          if (!pdfjsLib) {
+            resolve("");
+            return;
+          }
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const pdf = await pdfjsLib.getDocument({
+            data: e.target.result
+          }).promise;
+          let text = '';
+          for (let i = 1; i <= Math.min(pdf.numPages, 5); i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            // Preserve line structure
+            let lastY = null;
+            for (const item of content.items) {
+              if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) text += '\n';
+              text += item.str + ' ';
+              lastY = item.transform[5];
+            }
+            text += '\n';
+          }
+          resolve(text.trim());
+        } catch (err) {
+          resolve("");
+        }
+      };
+      reader.onerror = () => resolve("");
+      reader.readAsArrayBuffer(file);
+    });
+  };
+  const scanPDF = async file => {
+    setScanning(true);
+    setScanMsg("Wird gelesen…");
+    try {
+      if (file.type === "application/pdf") {
+        setScanMsg("PDF wird ausgelesen…");
+        const text = await extractPDFText(file);
+        if (!text || text.length < 10) {
+          setScanMsg("PDF konnte nicht gelesen werden — bitte manuell eintragen.");
+          setScanning(false);
+          return;
+        }
+        setScanMsg("Positionen werden erkannt…");
+        const {
+          supplier,
+          dn: delivNote,
+          belegType: bt,
+          items
+        } = parseTextToItems(text);
+        if (supplier && !supp) setSupp(supplier);
+        if (delivNote && !dn) setDn(delivNote);
+        if (bt) setBelegType(bt);
+        if (items.length > 0) {
+          setRows(items);
+          setScanMsg("✓ " + items.length + " Positionen erkannt");
+        } else setScanMsg("Keine Positionen erkannt — bitte manuell eintragen.\n\nRohtext:\n" + text.slice(0, 300));
+      } else {
+        setScanMsg("Fotos: bitte als PDF scannen oder manuell eintragen.");
+      }
+    } catch (e) {
+      setScanMsg("Fehler: " + String(e.message || e).slice(0, 80));
+    }
+    setScanning(false);
+  };
+  const onFile = e => {
+    var _e$target$files;
+    const f = (_e$target$files = e.target.files) === null || _e$target$files === void 0 ? void 0 : _e$target$files[0];
+    if (f) scanPDF(f);
+    e.target.value = "";
+  };
+  const save = async () => {
+    const proj = projects.find(p => p.id === pId);
+    await sm([...mats, {
+      id: uid(),
+      projectId: pId,
+      projectName: (proj === null || proj === void 0 ? void 0 : proj.name) || "",
+      date,
+      supplier: supp,
+      delivNote: dn,
+      belegType,
+      items: rows.filter(r => r.desc.trim()),
+      ts: now0()
+    }]);
+    setPId("");
+    setDate(toDay());
+    setSupp("");
+    setDn("");
+    setBelegType("Lieferschein");
+    setRows([{
+      desc: "",
+      qty: "1",
+      unit: "m²",
+      price: ""
+    }]);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+  const filt = [...mats].filter(m => fp === "all" || m.projectId === fp).sort((a, b) => b.date.localeCompare(a.date));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: "1rem"
+    }
+  }, "Materialien & Belege"), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1.5rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: "1rem"
+    }
+  }, "Neuen Beleg erfassen (Rechnung oder Lieferschein)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: "2px dashed #93c5fd",
+      borderRadius: 10,
+      padding: "14px",
+      textAlign: "center",
+      marginBottom: "1rem",
+      background: "#f0f9ff",
+      cursor: "pointer"
+    },
+    onClick: () => {
+      var _fileRef$current;
+      return !scanning && ((_fileRef$current = fileRef.current) === null || _fileRef$current === void 0 ? void 0 : _fileRef$current.click());
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    ref: fileRef,
+    type: "file",
+    accept: ".pdf,image/*",
+    style: {
+      display: "none"
+    },
+    onChange: onFile
+  }), scanning ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "spinner"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "13px",
+      color: "#1e40af"
+    }
+  }, scanMsg)) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "24px",
+      marginBottom: 3
+    }
+  }, "\uD83D\uDCC4"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      color: "#1e40af",
+      fontSize: "13px"
+    }
+  }, "PDF oder Foto hochladen \u2014 KI tr\xE4gt automatisch ein"), scanMsg && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 4,
+      fontSize: "12px",
+      color: scanMsg.startsWith("✓") ? "#16a34a" : "#6b7280"
+    }
+  }, scanMsg))), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, [["Baustelle *", /*#__PURE__*/React.createElement("select", {
+    value: pId,
+    onChange: e => setPId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 w\xE4hlen \u2014"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name)))], ["Datum", /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: date,
+    onChange: e => setDate(e.target.value)
+  })], ["Lieferant", /*#__PURE__*/React.createElement("input", {
+    value: supp,
+    onChange: e => setSupp(e.target.value),
+    placeholder: "z.B. Hornbach"
+  })], ["Belegart", /*#__PURE__*/React.createElement("select", {
+    value: belegType,
+    onChange: e => setBelegType(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", null, "Rechnung"), /*#__PURE__*/React.createElement("option", null, "Lieferschein"))], ["Belegnummer (RN / LS-Nr.)", /*#__PURE__*/React.createElement("input", {
+    value: dn,
+    onChange: e => setDn(e.target.value),
+    placeholder: "z.B. KRE 1675795 oder LS-2025-\u2026"
+  })]].map(([l, el]) => /*#__PURE__*/React.createElement("div", {
+    key: l
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, l), el))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "pos-table",
+    style: {
+      minWidth: 440
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+    style: {
+      textAlign: "left"
+    }
+  }, "Beschreibung"), /*#__PURE__*/React.createElement("th", null, "Menge"), /*#__PURE__*/React.createElement("th", null, "Einheit"), /*#__PURE__*/React.createElement("th", null, "EP \u20AC"), /*#__PURE__*/React.createElement("th", null, "Gesamt \u20AC"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 28
+    }
+  }))), /*#__PURE__*/React.createElement("tbody", null, rows.map((r, i) => /*#__PURE__*/React.createElement("tr", {
+    key: i
+  }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    value: r.desc,
+    onChange: e => upd(i, "desc", e.target.value),
+    placeholder: "Material\u2026"
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    type: "number",
+    value: r.qty,
+    onChange: e => upd(i, "qty", e.target.value),
+    style: {
+      textAlign: "right"
+    }
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("select", {
+    className: "cell-input",
+    value: r.unit,
+    onChange: e => upd(i, "unit", e.target.value)
+  }, UNITS.map(u => /*#__PURE__*/React.createElement("option", {
+    key: u
+  }, u)))), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    type: "number",
+    step: "0.01",
+    value: r.price,
+    onChange: e => upd(i, "price", e.target.value),
+    placeholder: "0.00",
+    style: {
+      textAlign: "right"
+    }
+  })), /*#__PURE__*/React.createElement("td", {
+    className: "total-col"
+  }, ((parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0)).toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setRows(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "13px"
+    }
+  }, "\u2715"))))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexWrap: "wrap",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setRows(x => [...x, {
+      desc: "",
+      qty: "1",
+      unit: "m²",
+      price: ""
+    }]),
+    style: {
+      fontSize: "13px",
+      padding: "6px 12px"
+    }
+  }, "+ Zeile"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("strong", null, fmtE(tot)), /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: save,
+    disabled: !pId || !rows.some(r => r.desc.trim())
+  }, saved ? "Gespeichert ✓" : "Speichern")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginBottom: ".75rem",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      flex: 1
+    }
+  }, "Gespeicherte Belege"), /*#__PURE__*/React.createElement("select", {
+    value: fp,
+    onChange: e => setFp(e.target.value),
+    style: {
+      width: "auto",
+      fontSize: "12px"
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "Alle"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name)))), filt.map(m => {
+    const t = m.items.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
+    return /*#__PURE__*/React.createElement("div", {
+      key: m.id,
+      className: "card",
+      style: {
+        marginBottom: 7
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 8,
+        alignItems: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontWeight: 600,
+        fontSize: "13px"
+      }
+    }, m.projectName), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: "12px",
+        color: "#6b7280"
+      }
+    }, fmtD(m.date), m.supplier ? " · " + m.supplier : "", m.delivNote ? " · " + (m.belegType || "Lieferschein") + ": " + m.delivNote : "")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "badge-amber"
+    }, fmtE(t)), /*#__PURE__*/React.createElement("button", {
+      onClick: () => sm(mats.filter(x => x.id !== m.id)),
+      style: {
+        background: "none",
+        border: "none",
+        color: "#dc2626",
+        cursor: "pointer",
+        fontSize: "12px"
+      }
+    }, "l\xF6schen"))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 5,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 3
+      }
+    }, m.items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "tag"
+    }, it.desc, " ", it.qty, " ", it.unit))));
+  }));
+}
+
+// ── Invoice ───────────────────────────────────────────────────────────────
+function Invoice({
+  entries,
+  projects,
+  mats,
+  co
+}) {
+  const [type, setType] = useState("abschlag");
+  const [pId, setPId] = useState("");
+  const [invNo, setNo] = useState("RE-" + new Date().getFullYear() + "-001");
+  const [invDate, setDate] = useState(fmtD(toDay()));
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState(toDay());
+  const [useE, setUseE] = useState(true);
+  const [manH, setManH] = useState("");
+  const [rate, setRate] = useState("");
+  const [posRows, setPR] = useState([{
+    id: "r1",
+    pos: "1",
+    desc: "Baustelleneinrichtung",
+    qty: "1",
+    unit: "pschl.",
+    ep: "150"
+  }, {
+    id: "r2",
+    pos: "2",
+    desc: "Regieleistung",
+    qty: "",
+    unit: "h",
+    ep: "",
+    isLabor: true
+  }, {
+    id: "r3",
+    pos: "3",
+    desc: "Material lt. Lieferscheine",
+    qty: "",
+    unit: "",
+    ep: "",
+    isMat: true
+  }]);
+  const [selM, setSelM] = useState([]);
+  const [aufschlag, setAufschlag] = useState("1.8");
+  const [lagerItems, setLagerItems] = useState([{
+    desc: "",
+    qty: "1",
+    unit: "Stk.",
+    price: ""
+  }]);
+  const [deds, setDeds] = useState([{
+    id: "d1",
+    label: "",
+    amount: ""
+  }]);
+  const [vorauszBetrag, setVB] = useState("");
+  const [vorauszDesc, setVD] = useState("Vorauszahlung Trockenbauarbeiten");
+  const [zahlFrist, setZF] = useState("8");
+  const [loading, setLoad] = useState(false);
+  const [aiText, setAi] = useState("");
+  const filtE = entries.filter(e => e.projectId === pId && (!from || e.date >= from) && (!to || e.date <= to));
+  const totalH = useE ? filtE.reduce((s, e) => s + e.hours, 0) : parseFloat(manH) || 0;
+  const projM = mats.filter(m => m.projectId === pId);
+  const selMD = mats.filter(m => selM.includes(m.id));
+  const af = parseFloat(aufschlag) || 1;
+  const rawMatLS = selMD.reduce((s, m) => s + m.items.reduce((s2, r) => s2 + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0), 0);
+  const rawMatLager = lagerItems.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
+  const rawMat = rawMatLS + rawMatLager;
+  const matSum = rawMat * af;
+  const proj = projects.find(p => p.id === pId);
+  const getRT = r => {
+    if (r.isLabor) return totalH * (parseFloat(rate) || 0);
+    if (r.isMat) return matSum;
+    const q = parseFloat(r.qty) || 0,
+      ep = parseFloat(r.ep) || 0;
+    return q && ep ? q * ep : ep;
+  };
+  const netTotal = type === "vorauszahlung" ? parseFloat(vorauszBetrag) || 0 : posRows.reduce((s, r) => s + getRT(r), 0);
+  const mwst = netTotal * 0.19;
+  const gross = netTotal + mwst;
+  const dedSum = deds.reduce((s, d) => s + (parseFloat(d.amount) || 0), 0);
+  const final = gross - dedSum;
+  const addRow = () => setPR(r => [...r, {
+    id: uid(),
+    pos: String(r.length + 1),
+    desc: "",
+    qty: "",
+    unit: "m²",
+    ep: ""
+  }]);
+  const updR = (id, k, v) => setPR(r => r.map(x => x.id === id ? {
+    ...x,
+    [k]: v
+  } : x));
+  const delR = id => setPR(r => r.filter(x => x.id !== id));
+  const togM = id => setSelM(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
+  const genAI = async () => {
+    setLoad(true);
+    setAi("");
+    const lines = filtE.map(e => `${fmtD(e.date)}, ${fmtT(e.ts)} Uhr: ${e.workerName} – ${e.hours}h${e.voiceDe || e.voice ? " – " + (e.voiceDe || e.voice).slice(0, 80) : ""}`).join("\n") || "Keine Einträge.";
+    const posStr = posRows.map(r => `Pos.${r.pos} ${r.desc}: ${fmtE(getRT(r))}`).join("\n");
+    const prompt = `VOB/B-konforme Rechnung auf Deutsch.\nRechnungsnr.: ${invNo} | Datum: ${invDate}\nAN: ${co.name}, ${co.street}, ${co.zip} ${co.city}\nAG: ${(proj === null || proj === void 0 ? void 0 : proj.client) || ""}, ${(proj === null || proj === void 0 ? void 0 : proj.address) || ""}\nBauvorhaben: ${(proj === null || proj === void 0 ? void 0 : proj.name) || ""}\nZeitraum: ${from ? fmtD(from) : "Vertragsbeginn"} bis ${fmtD(to)}\nPositionen:\n${posStr}\nNetto: ${fmtE(netTotal)} | MwSt.19%: ${fmtE(mwst)} | Brutto: ${fmtE(gross)}\nRechnungsbetrag: ${fmtE(final)}\nMit §16 VOB/B, 10 Tage Zahlungsfrist. Nur Rechnungstext.`;
+    try {
+      setAi(await callAI(prompt, 1800));
+    } catch (e) {
+      setAi("Fehler: " + e.message);
+    }
+    setLoad(false);
+  };
+  const printInvoice = () => {
+    const dedRows = deds.filter(d => d.label && d.amount);
+    const lagerValid = lagerItems.filter(r => r.desc.trim());
+    const hasPage2 = selMD.length > 0 || lagerValid.length > 0;
+    const posHtml = posRows.map(r => {
+      const t = getRT(r);
+      const qtyStr = r.isLabor ? String(totalH) : r.isMat ? "" : r.qty || "";
+      const unitStr = r.isLabor ? "h" : r.isMat ? "" : r.unit;
+      const epStr = r.isLabor ? (parseFloat(rate) || 0).toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " EUR/h" : r.isMat ? "lt. Anlage" : r.ep ? parseFloat(r.ep).toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) : "";
+      const betStr = t > 0 ? t.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) : "";
+      return "<tr>" + "<td style='text-align:center;padding:4px 7px;border-bottom:0.5pt solid #ddd;font-weight:bold'>" + r.pos + "</td>" + "<td style='padding:4px 7px;border-bottom:0.5pt solid #ddd'>" + r.desc + "</td>" + "<td style='text-align:right;padding:4px 7px;border-bottom:0.5pt solid #ddd'>" + qtyStr + "</td>" + "<td style='text-align:center;padding:4px 7px;border-bottom:0.5pt solid #ddd'>" + unitStr + "</td>" + "<td style='text-align:right;padding:4px 7px;border-bottom:0.5pt solid #ddd'>" + epStr + "</td>" + "<td style='text-align:right;padding:4px 7px;border-bottom:0.5pt solid #ddd;font-weight:bold'>" + betStr + "</td>" + "</tr>";
+    }).join("");
+    const dedHtml = dedRows.map(d => "<tr><td colspan='3' style='padding:2px 7px;color:#555;font-size:8.5pt'>" + d.label + "</td><td style='text-align:right;padding:2px 7px'>-" + parseFloat(d.amount).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " EUR</td></tr>").join("");
+
+    // Page 2 material rows
+    const matRows = [];
+    selMD.forEach(m => {
+      m.items.forEach(it => {
+        const ep = parseFloat(it.price || 0),
+          qty = parseFloat(it.qty) || 0;
+        matRows.push({
+          desc: it.desc,
+          qty,
+          unit: it.unit,
+          ep,
+          epMit: ep * af,
+          total: qty * ep * af,
+          meta: fmtD(m.date) + (m.supplier ? " / " + m.supplier : "") + (m.delivNote ? " / " + (m.belegType === "Rechnung" ? "RN" : "LS") + ": " + m.delivNote : "")
+        });
+      });
+    });
+    lagerValid.forEach(it => {
+      const ep = parseFloat(it.price || 0),
+        qty = parseFloat(it.qty) || 0;
+      matRows.push({
+        desc: it.desc,
+        qty,
+        unit: it.unit,
+        ep,
+        epMit: ep * af,
+        total: qty * ep * af,
+        meta: ""
+      });
+    });
+    const matHtml = matRows.map(r => "<tr>" + "<td style='padding:3px 7px;border-bottom:0.5pt solid #eee;font-size:8.5pt;color:#555'>" + r.meta + "</td>" + "<td style='padding:3px 7px;border-bottom:0.5pt solid #eee'>" + r.desc + "</td>" + "<td style='text-align:right;padding:3px 7px;border-bottom:0.5pt solid #eee'>" + r.qty + "</td>" + "<td style='text-align:center;padding:3px 7px;border-bottom:0.5pt solid #eee'>" + r.unit + "</td>" + "<td style='text-align:right;padding:3px 7px;border-bottom:0.5pt solid #eee'>" + r.ep.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + "</td>" + "<td style='text-align:right;padding:3px 7px;border-bottom:0.5pt solid #eee'>" + r.epMit.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + "</td>" + "<td style='text-align:right;padding:3px 7px;border-bottom:0.5pt solid #eee;font-weight:bold'>" + r.total.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + "</td>" + "</tr>").join("");
+    const typeLabel = type === "schluss" ? "Schlussrechnung" : type === "vorauszahlung" ? "Vorauszahlungsrechnung" : "Abschlagsrechnung";
+    const totalPages = hasPage2 ? 2 : 1;
+
+    // Shared CSS
+    const CSS = `
+*{font-family:Arial,sans-serif;font-size:10pt;box-sizing:border-box;margin:0;padding:0;color:#111}
+body{background:#fff}
+.page{padding:15mm 18mm 28mm 18mm;min-height:297mm;position:relative}
+/* Header */
+.hdr-r1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2mm}
+.hdr-logo{display:flex;align-items:flex-end;gap:2px}
+.hdr-t{font-size:30pt;font-style:italic;font-weight:900;line-height:1}
+.hdr-w{font-size:20pt;font-style:italic;font-weight:900;line-height:1}
+.hdr-name{font-size:12pt;font-weight:bold;margin-left:8px;line-height:1.2}
+.hdr-gewerk{text-align:right;font-size:8pt;line-height:1.7;color:#333}
+.hdr-r2{font-size:8pt;color:#333;margin-bottom:12mm}
+/* Return address */
+.ret{font-size:7.5pt;color:#333;text-decoration:underline;margin-bottom:3mm}
+/* Address block */
+.addr{display:grid;grid-template-columns:55% 45%;margin-bottom:10mm;min-height:40mm}
+.addr-l{font-size:10.5pt;line-height:1.9}
+.addr-r{font-size:8.5pt;line-height:1.0;padding-left:10mm}
+.addr-r table{border-collapse:collapse;margin-left:auto}
+.addr-r td{padding:1.5px 0}
+.addr-r .lbl{color:#333;padding-right:6px;white-space:nowrap}
+/* Title */
+.inv-title{font-size:18pt;font-weight:bold;margin-bottom:4mm}
+/* Project */
+.proj{font-size:9.5pt;margin-bottom:5mm;line-height:1.7}
+.proj table{border-collapse:collapse}
+.proj td{padding:0}
+.proj .k{padding-right:8px;white-space:nowrap;vertical-align:top}
+/* Positions table */
+table.pos{width:100%;border-collapse:collapse;margin-bottom:4mm;font-size:9.5pt}
+table.pos thead tr{background:#111;color:#fff}
+table.pos th{padding:4px 7px;font-weight:600;font-size:8.5pt;text-align:right}
+table.pos th:nth-child(1),table.pos th:nth-child(2){text-align:left}
+table.pos td{padding:4px 7px;border-bottom:0.5pt solid #e8e8e8;vertical-align:top}
+table.pos td:nth-child(1){width:10mm;text-align:center;font-weight:bold}
+table.pos td:nth-child(2){text-align:left}
+table.pos td:not(:nth-child(1)):not(:nth-child(2)){text-align:right}
+/* Totals */
+.totals{display:flex;justify-content:flex-end;margin-bottom:5mm}
+.totals table{border-collapse:collapse;width:95mm}
+.totals td{padding:2px 7px;font-size:9.5pt}
+.totals td:last-child{text-align:right}
+.totals .line td{border-top:0.5pt solid #777}
+.totals .bold td{font-weight:bold}
+.totals .final td{font-weight:bold;text-decoration:underline;font-size:10.5pt;padding-top:4px}
+.totals .ded-hdr td{font-size:8.5pt;color:#555;padding-top:6px}
+.totals .ded td{font-size:9pt}
+/* Legal */
+.legal{font-size:8.5pt;color:#333;line-height:1.6;margin-bottom:4mm}
+/* Footer - fixed at bottom */
+.footer{position:fixed;bottom:8mm;left:18mm;right:18mm;font-size:7pt;color:#333;line-height:1.55;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0 8mm}
+@media print{
+  @page{size:A4;margin:0}
+  body{width:210mm}
+  table.pos thead tr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}`;
+
+    // Recipient lines
+    const addrParts = ((proj === null || proj === void 0 ? void 0 : proj.address) || "").split(",").map(s => s.trim()).filter(Boolean);
+    const recipientHtml = ((proj === null || proj === void 0 ? void 0 : proj.client) || "") + "<br>" + addrParts.join("<br>");
+    const p1 = `<div class="page">
+  <!-- HEADER -->
+  <div class="hdr-r1">
+    <div>
+      <div class="hdr-logo">
+        <span class="hdr-t">T</span><span class="hdr-w">w</span>
+        <span class="hdr-name">Trockenbau - Akustik - Meisterbetrieb</span>
+      </div>
+      <div class="hdr-r2">${co.name} &middot; ${co.street} &middot; ${co.zip} ${co.city}</div>
+    </div>
+    <div class="hdr-gewerk">Dachgeschossausbau<br>Trennw&auml;nde &middot; Fu&szlig;b&ouml;den<br>Unterhangdecken &middot; Brandschutz<br>WC - Trennw&auml;nde &middot; T&uuml;ren<br>${co.website}</div>
+  </div>
+
+  <!-- RETURN ADDRESS + RECIPIENT + SENDER -->
+  <div class="ret">${co.name}, ${co.street}, ${co.zip} ${co.city}</div>
+  <div class="addr">
+    <div class="addr-l">${recipientHtml}</div>
+    <div class="addr-r">
+      <strong>Postanschrift:</strong><br>
+      ${co.name}<br>
+      Herr ${co.manager}<br>
+      ${co.street}<br>
+      ${co.zip} ${co.city}<br>
+      <br>
+      <table>
+        <tr><td class="lbl">Ansprechpartner:</td><td>Herr ${co.manager}</td></tr>
+        <tr><td class="lbl">Telefon:</td><td>${co.phone}</td></tr>
+        <tr><td class="lbl">Telefax:</td><td>.</td></tr>
+        <tr><td class="lbl">Mobil:</td><td>${co.mobile}</td></tr>
+        <tr><td class="lbl">E-Mail:</td><td>${co.email}</td></tr>
+      </table>
+      <br>
+      ${co.city}, ${invDate}
+    </div>
+  </div>
+
+  <!-- INVOICE TITLE -->
+  <div class="inv-title">${typeLabel} ${invNo}</div>
+
+  <!-- PROJECT INFO -->
+  <div class="proj"><table>
+    <tr><td class="k">Projekt:</td><td><strong>${(proj === null || proj === void 0 ? void 0 : proj.name) || ""}${proj !== null && proj !== void 0 && proj.address ? ", " + proj.address : ""}</strong></td></tr>
+    <tr><td class="k">Gewerk:</td><td>${(proj === null || proj === void 0 ? void 0 : proj.trade) || "Trockenbau"}${from ? " (Zeitraum " + fmtD(from) + (to ? " - " + fmtD(to) : "") + ")" : " "}</td></tr>
+    ${proj !== null && proj !== void 0 && proj.contractRef ? `<tr><td class="k">Auftrag:</td><td>${proj.contractRef}</td></tr>` : ""}
+    ${proj !== null && proj !== void 0 && proj.description ? `<tr><td class="k"></td><td><strong>${proj.description}</strong></td></tr>` : ""}
+  </table></div>
+
+  <!-- POSITIONS TABLE -->
+  <table class="pos"><thead><tr>
+    <th style="text-align:left;width:10mm"></th>
+    <th style="text-align:left">Leistungsbeschreibung</th>
+    <th style="width:18mm">Menge</th>
+    <th style="width:12mm">Einh.</th>
+    <th style="width:20mm">EP &euro;</th>
+    <th style="width:26mm">Betrag &euro;</th>
+  </tr></thead><tbody>${posHtml}</tbody></table>
+
+  <!-- TOTALS -->
+  <div class="totals"><table>
+    <tr><td>Nettobetrag</td><td>${netTotal.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td></tr>
+    <tr><td>zzgl. MwSt.</td><td style="text-align:right">19%</td></tr>
+    <tr class="line"><td></td><td>${mwst.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td></tr>
+    <tr><td></td><td>${gross.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td></tr>
+    ${dedRows.length ? `<tr class="ded-hdr"><td colspan="2"></td></tr>` + dedRows.map(d => `<tr class="ded"><td>${d.label}</td><td>-${parseFloat(d.amount).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td></tr>`).join("") : ""}
+    <tr class="bold final"><td>Rechnungsbetrag</td><td>${final.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td></tr>
+  </table></div>
+
+  <!-- LEGAL -->
+  <div style="text-align:right;font-size:8pt;color:#555;margin-bottom:5mm">Seite 1 von ${totalPages}</div>
+  <div class="legal">
+    Der Auftraggeber ist kein Bauunternehmen nach &sect; 13 b Abs. 1 Satz 1 Nr. 4 UStG.<br>
+    Auftraggeber auch Privatleute m&uuml;ssen diese Rechnung gem&auml;&szlig; &sect; 14 b Abs. 1 Satz 5 UStG mind. 2 Jahre aufbewahren.<br><br>
+    Zahlung f&auml;llig ${zahlFrist} Tage nach Rechnungsstellung.
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>${co.name}<br>${co.street}<br>${co.zip} ${co.city}<br>Tel. ${co.phone}</div>
+    <div>Gesch&auml;ftsf&uuml;hrer: ${co.manager}<br>Sitz der Gesellschaft: ${co.city}<br>${co.hrb}<br>St.-Nr.: ${co.stNr}</div>
+    <div>${co.bank}<br>BIC ${co.bic}<br>IBAN ${co.iban}</div>
+    <div style="text-align:right;align-self:end">Seite 1 von ${totalPages}</div>
+  </div>
+</div>`;
+    const p2 = hasPage2 ? `<div class="page" style="page-break-before:always">
+  <!-- HEADER PAGE 2 -->
+  <div class="hdr-r1">
+    <div>
+      <div class="hdr-logo">
+        <span class="hdr-t">T</span><span class="hdr-w">w</span>
+        <span class="hdr-name">Trockenbau - Akustik - Meisterbetrieb</span>
+      </div>
+      <div class="hdr-r2">${co.name} &middot; ${co.street} &middot; ${co.zip} ${co.city}</div>
+    </div>
+    <div class="hdr-gewerk">Dachgeschossausbau<br>Trennw&auml;nde &middot; Fu&szlig;b&ouml;den<br>Unterhangdecken &middot; Brandschutz<br>WC - Trennw&auml;nde &middot; T&uuml;ren<br>${co.website}</div>
+  </div>
+
+  <!-- MATERIAL TABLE -->
+  <div style="font-size:12pt;font-weight:bold;margin-bottom:2mm">Materialnachweis</div>
+  <div style="font-size:8.5pt;color:#555;margin-bottom:5mm">zur ${typeLabel} ${invNo} | Projekt: ${(proj === null || proj === void 0 ? void 0 : proj.name) || ""} | ${(proj === null || proj === void 0 ? void 0 : proj.client) || ""}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:9pt">
+    <thead><tr style="background:#111;color:#fff">
+      <th style="padding:4px 7px;text-align:left;width:34mm">Datum / Lieferant / Nr.</th>
+      <th style="padding:4px 7px;text-align:left">Beschreibung</th>
+      <th style="padding:4px 7px;text-align:right;width:14mm">Menge</th>
+      <th style="padding:4px 7px;text-align:center;width:11mm">Einh.</th>
+      <th style="padding:4px 7px;text-align:right;width:17mm">EP &euro;</th>
+      <th style="padding:4px 7px;text-align:right;width:17mm">EP &times; ${aufschlag}</th>
+      <th style="padding:4px 7px;text-align:right;width:20mm">Betrag &euro;</th>
+    </tr></thead>
+    <tbody>${matHtml}</tbody>
+    <tfoot><tr style="border-top:1.5pt solid #111">
+      <td colspan="6" style="text-align:right;padding:5px 7px;font-weight:bold">Gesamt (${matRows.length} Pos. &times; Aufschlag ${aufschlag}):</td>
+      <td style="text-align:right;padding:5px 7px;font-weight:bold;font-size:10.5pt">${matSum.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} &euro;</td>
+    </tr></tfoot>
+  </table>
+  <div style="text-align:right;font-size:8pt;color:#555;margin-top:5mm">Seite 2 von 2</div>
+
+  <!-- FOOTER PAGE 2 -->
+  <div class="footer">
+    <div>${co.name}<br>${co.street}<br>${co.zip} ${co.city}<br>Tel. ${co.phone}</div>
+    <div>Gesch&auml;ftsf&uuml;hrer: ${co.manager}<br>Sitz der Gesellschaft: ${co.city}<br>${co.hrb}<br>St.-Nr.: ${co.stNr}</div>
+    <div>${co.bank}<br>BIC ${co.bic}<br>IBAN ${co.iban}</div>
+  </div>
+</div>` : "";
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${invNo}</title><style>${CSS}</style></head><body>${p1}${p2}</body></html>`;
+    const w = window.open("", "_blank");
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => w.print(), 500);
+  };
+  const TypeBtn = ({
+    k,
+    l
+  }) => /*#__PURE__*/React.createElement("button", {
+    onClick: () => setType(k),
+    style: {
+      padding: "7px 13px",
+      background: type === k ? "#dbeafe" : "#f9fafb",
+      border: type === k ? "1px solid #93c5fd" : "1px solid #e5e7eb",
+      borderRadius: 8,
+      cursor: "pointer",
+      color: type === k ? "#1e40af" : "#374151",
+      fontWeight: type === k ? 600 : 400,
+      fontSize: "13px"
+    }
+  }, l);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: ".875rem"
+    }
+  }, "Rechnung & Kalkulation"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      marginBottom: "1.25rem",
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement(TypeBtn, {
+    k: "vorauszahlung",
+    l: "Vorauszahlungsrechnung"
+  }), /*#__PURE__*/React.createElement(TypeBtn, {
+    k: "abschlag",
+    l: "Abschlagsrechnung"
+  }), /*#__PURE__*/React.createElement(TypeBtn, {
+    k: "schluss",
+    l: "Schlussrechnung"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Baustelle *"), /*#__PURE__*/React.createElement("select", {
+    value: pId,
+    onChange: e => setPId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 w\xE4hlen \u2014"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Rechnungsnummer"), /*#__PURE__*/React.createElement("input", {
+    value: invNo,
+    onChange: e => setNo(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Datum"), /*#__PURE__*/React.createElement("input", {
+    value: invDate,
+    onChange: e => setDate(e.target.value),
+    placeholder: "TT.MM.JJJJ"
+  })), type !== "vorauszahlung" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Stundensatz (\u20AC/h)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: rate,
+    onChange: e => setRate(e.target.value),
+    placeholder: "z.B. 58"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Zahlungsfrist (Tage)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: zahlFrist,
+    onChange: e => setZF(e.target.value),
+    placeholder: "8"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Leistungszeitraum von"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: from,
+    onChange: e => setFrom(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "bis"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: to,
+    onChange: e => setTo(e.target.value)
+  })))), type === "vorauszahlung" && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem",
+      borderLeft: "3px solid #d97706"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      color: "#92400e",
+      marginBottom: ".75rem"
+    }
+  }, "Vorauszahlungsrechnung \u2013 wird sp\xE4ter von der Schlussrechnung abgezogen"), /*#__PURE__*/React.createElement("div", {
+    className: "grid2"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Betrag (Netto) \u20AC"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: vorauszBetrag,
+    onChange: e => setVB(e.target.value),
+    placeholder: "z.B. 5000.00",
+    style: {
+      fontSize: "16px",
+      fontWeight: 600
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Beschreibung"), /*#__PURE__*/React.createElement("input", {
+    value: vorauszDesc,
+    onChange: e => setVD(e.target.value)
+  })))), type !== "vorauszahlung" && pId && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      alignItems: "center",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl",
+    style: {
+      margin: 0,
+      flex: 1
+    }
+  }, "Aufschlag auf alle Materialien"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "13px",
+      color: "#6b7280"
+    }
+  }, "Faktor:"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.1",
+    value: aufschlag,
+    onChange: e => setAufschlag(e.target.value),
+    style: {
+      width: 70,
+      fontSize: "14px",
+      fontWeight: 600,
+      textAlign: "center"
+    }
+  }))), rawMat > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "8px 12px",
+      background: "#f0fdf4",
+      border: "1px solid #86efac",
+      borderRadius: 8,
+      fontSize: "12px",
+      color: "#166534"
+    }
+  }, "Materialeinkauf netto: ", fmtE(rawMat), " \xD7 ", aufschlag, " = ", /*#__PURE__*/React.createElement("strong", null, fmtE(matSum)), " \u2192 Pos. 3"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      border: "1px solid #e5e7eb",
+      borderRadius: 8,
+      overflow: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "pos-table",
+    style: {
+      minWidth: 400
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+    style: {
+      textAlign: "left"
+    }
+  }, "Beschreibung"), /*#__PURE__*/React.createElement("th", null, "Menge"), /*#__PURE__*/React.createElement("th", null, "Einheit"), /*#__PURE__*/React.createElement("th", null, "EP \u20AC"), /*#__PURE__*/React.createElement("th", null, "Gesamt \u20AC"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 28
+    }
+  }))), /*#__PURE__*/React.createElement("tbody", null, lagerItems.map((r, i) => /*#__PURE__*/React.createElement("tr", {
+    key: i
+  }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    value: r.desc,
+    onChange: e => setLagerItems(x => x.map((v, j) => j === i ? {
+      ...v,
+      desc: e.target.value
+    } : v)),
+    placeholder: "Material ohne Lieferschein\u2026"
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    type: "number",
+    value: r.qty,
+    onChange: e => setLagerItems(x => x.map((v, j) => j === i ? {
+      ...v,
+      qty: e.target.value
+    } : v)),
+    style: {
+      textAlign: "right"
+    }
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("select", {
+    className: "cell-input",
+    value: r.unit,
+    onChange: e => setLagerItems(x => x.map((v, j) => j === i ? {
+      ...v,
+      unit: e.target.value
+    } : v))
+  }, UNITS.map(u => /*#__PURE__*/React.createElement("option", {
+    key: u
+  }, u)))), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+    className: "cell-input",
+    type: "number",
+    step: "0.01",
+    value: r.price,
+    onChange: e => setLagerItems(x => x.map((v, j) => j === i ? {
+      ...v,
+      price: e.target.value
+    } : v)),
+    placeholder: "0.00",
+    style: {
+      textAlign: "right"
+    }
+  })), /*#__PURE__*/React.createElement("td", {
+    className: "total-col"
+  }, ((parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0)).toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setLagerItems(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "13px"
+    }
+  }, "\u2715"))))))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setLagerItems(x => [...x, {
+      desc: "",
+      qty: "1",
+      unit: "Stk.",
+      price: ""
+    }]),
+    style: {
+      marginTop: 6,
+      fontSize: "12px",
+      padding: "5px 12px"
+    }
+  }, "+ Zeile hinzuf\xFCgen"))), type !== "vorauszahlung" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1.25rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af",
+      textTransform: "uppercase",
+      letterSpacing: ".5px",
+      fontWeight: 600,
+      marginBottom: ".5rem"
+    }
+  }, "Positionen"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: "1px solid #e5e7eb",
+      borderRadius: 10,
+      overflow: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "pos-table",
+    style: {
+      minWidth: 560
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+    style: {
+      textAlign: "center",
+      width: 40
+    }
+  }, "Pos."), /*#__PURE__*/React.createElement("th", {
+    style: {
+      textAlign: "left"
+    }
+  }, "Beschreibung"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 72
+    }
+  }, "Menge"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 58
+    }
+  }, "Einheit"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 88
+    }
+  }, "EP / Betrag \u20AC"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 95,
+      color: "#2563eb"
+    }
+  }, "Gesamt \u20AC"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      width: 28
+    }
+  }))), /*#__PURE__*/React.createElement("tbody", null, posRows.map(r => {
+    const t = getRT(r),
+      isSp = r.isLabor || r.isMat;
+    return /*#__PURE__*/React.createElement("tr", {
+      key: r.id,
+      style: {
+        background: isSp ? "#fafafa" : undefined
+      }
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      value: r.pos,
+      onChange: e => updR(r.id, "pos", e.target.value),
+      style: {
+        textAlign: "center",
+        fontWeight: 600
+      }
+    })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      value: r.desc,
+      onChange: e => updR(r.id, "desc", e.target.value),
+      placeholder: "Beschreibung\u2026"
+    }), r.isLabor && pId && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: "11px",
+        color: "#6b7280",
+        marginTop: 2
+      }
+    }, /*#__PURE__*/React.createElement("label", {
+      style: {
+        cursor: "pointer"
+      }
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "checkbox",
+      checked: useE,
+      onChange: e => setUseE(e.target.checked),
+      style: {
+        marginRight: 3
+      }
+    }), "Aus Eintr\xE4gen (", filtE.reduce((s, e) => s + e.hours, 0), " Std.)")), r.isMat && pId && projM.length > 0 && /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 3
+      }
+    }, projM.map(m => {
+      const t2 = m.items.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
+      const s = selM.includes(m.id);
+      return /*#__PURE__*/React.createElement("label", {
+        key: m.id,
+        style: {
+          display: "block",
+          fontSize: "11px",
+          cursor: "pointer",
+          color: s ? "#16a34a" : "#6b7280",
+          marginBottom: 1
+        }
+      }, /*#__PURE__*/React.createElement("input", {
+        type: "checkbox",
+        checked: s,
+        onChange: () => togM(m.id),
+        style: {
+          marginRight: 3
+        }
+      }), fmtD(m.date), m.supplier ? " · " + m.supplier : "", " \u2014 ", fmtE(t2));
+    }))), /*#__PURE__*/React.createElement("td", null, r.isLabor ? useE ? /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, totalH) : /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      type: "number",
+      value: manH,
+      onChange: e => setManH(e.target.value),
+      placeholder: "Std.",
+      style: {
+        textAlign: "right"
+      }
+    }) : r.isMat ? /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, "\u2013") : /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      type: "number",
+      value: r.qty,
+      onChange: e => updR(r.id, "qty", e.target.value),
+      placeholder: "\u2013",
+      style: {
+        textAlign: "right"
+      }
+    })), /*#__PURE__*/React.createElement("td", null, r.isLabor ? /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, "h") : r.isMat ? /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, "\u2013") : /*#__PURE__*/React.createElement("select", {
+      className: "cell-input",
+      value: r.unit,
+      onChange: e => updR(r.id, "unit", e.target.value),
+      style: {
+        fontSize: "12px"
+      }
+    }, UNITS.map(u => /*#__PURE__*/React.createElement("option", {
+      key: u
+    }, u)))), /*#__PURE__*/React.createElement("td", null, r.isLabor ? /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      type: "number",
+      step: "0.01",
+      value: rate,
+      onChange: e => setRate(e.target.value),
+      placeholder: "\u20AC/h",
+      style: {
+        textAlign: "right",
+        fontWeight: 600
+      }
+    }) : r.isMat ? /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, "lt. LS \xD7 ", aufschlag) : /*#__PURE__*/React.createElement("input", {
+      className: "cell-input",
+      type: "number",
+      step: "0.01",
+      value: r.ep,
+      onChange: e => updR(r.id, "ep", e.target.value),
+      placeholder: "0.00",
+      style: {
+        textAlign: "right"
+      }
+    })), /*#__PURE__*/React.createElement("td", {
+      className: "total-col"
+    }, t > 0 ? t.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) : /*#__PURE__*/React.createElement("span", {
+      className: "muted"
+    }, "\u2013")), /*#__PURE__*/React.createElement("td", null, !isSp && /*#__PURE__*/React.createElement("button", {
+      onClick: () => delR(r.id),
+      style: {
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: "#9ca3af",
+        fontSize: "13px",
+        padding: "2px 4px"
+      }
+    }, "\u2715")));
+  })))), /*#__PURE__*/React.createElement("button", {
+    onClick: addRow,
+    style: {
+      marginTop: 8,
+      fontSize: "12px",
+      padding: "5px 12px"
+    }
+  }, "+ Position hinzuf\xFCgen"))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem",
+      borderLeft: "3px solid #2563eb"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sum-row"
+  }, /*#__PURE__*/React.createElement("span", null, "Nettobetrag"), /*#__PURE__*/React.createElement("span", null, fmtE(netTotal))), /*#__PURE__*/React.createElement("div", {
+    className: "sum-row"
+  }, /*#__PURE__*/React.createElement("span", null, "zzgl. MwSt. 19 %"), /*#__PURE__*/React.createElement("span", null, fmtE(mwst))), /*#__PURE__*/React.createElement("div", {
+    className: "sum-row bold top"
+  }, /*#__PURE__*/React.createElement("span", null, "Bruttobetrag"), /*#__PURE__*/React.createElement("span", null, fmtE(gross))), (type === "abschlag" || type === "schluss") && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "1rem",
+      paddingTop: "1rem",
+      borderTop: "1px solid #e5e7eb"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280",
+      marginBottom: 8,
+      fontWeight: 500
+    }
+  }, "Abz\xFCge \u2013 bereits bezahlte Rechnungen:"), deds.map((d, i) => /*#__PURE__*/React.createElement("div", {
+    key: d.id,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 6,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: d.label,
+    onChange: e => setDeds(x => x.map((r, j) => j === i ? {
+      ...r,
+      label: e.target.value
+    } : r)),
+    placeholder: "z.B. RN 06/2025",
+    style: {
+      flex: 2,
+      fontSize: "13px"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: d.amount,
+    onChange: e => setDeds(x => x.map((r, j) => j === i ? {
+      ...r,
+      amount: e.target.value
+    } : r)),
+    placeholder: "Betrag \u20AC",
+    style: {
+      flex: 1,
+      fontSize: "13px",
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setDeds(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "13px",
+      padding: "2px 4px"
+    }
+  }, "\u2715"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setDeds(x => [...x, {
+      id: uid(),
+      label: "",
+      amount: ""
+    }]),
+    style: {
+      fontSize: "12px",
+      padding: "5px 10px"
+    }
+  }, "+ Abzug hinzuf\xFCgen"), dedSum > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "sum-row",
+    style: {
+      marginTop: 8,
+      color: "#dc2626"
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Abz\xFCge gesamt"), /*#__PURE__*/React.createElement("span", null, "\u2013", fmtE(dedSum)))), /*#__PURE__*/React.createElement("div", {
+    className: "sum-final"
+  }, /*#__PURE__*/React.createElement("span", null, "Rechnungsbetrag"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#2563eb"
+    }
+  }, fmtE(final)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap",
+      marginBottom: "1.25rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: printInvoice,
+    disabled: !pId,
+    className: "btn-blue"
+  }, "Druckvorschau / PDF \u2197"), /*#__PURE__*/React.createElement("button", {
+    onClick: genAI,
+    disabled: !pId || loading,
+    className: "btn-green"
+  }, loading ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "spinner"
+  }), "KI schreibt\u2026") : "KI-Rechnungstext ↗"), aiText && /*#__PURE__*/React.createElement("button", {
+    onClick: () => navigator.clipboard.writeText(aiText)
+  }, "Kopieren")), aiText && /*#__PURE__*/React.createElement("textarea", {
+    value: aiText,
+    onChange: e => setAi(e.target.value),
+    rows: 14,
+    className: "ai-out",
+    style: {
+      resize: "vertical"
+    }
+  }));
+}
+
+// ── Rücklauf placeholder ──────────────────────────────────────────────────
+function Ruecklauf({
+  projects,
+  co
+}) {
+  const [pId, setPId] = useState("");
+  const [subName, setSubN] = useState("");
+  const [subAddr, setSubA] = useState("");
+  const [baustelle, setBst] = useState("");
+  const [rnNum, setRnNum] = useState("");
+  const [rnDate, setRnDate] = useState("");
+  const [rnEin, setRnEin] = useState("");
+  const [rnType, setRnType] = useState("Schlussrechnung");
+  const [rnNetto, setRnN] = useState("");
+  const [maengel, setMae] = useState("0");
+  const [nachtraege, setNtr] = useState("0");
+  const [restl, setRest] = useState("0");
+  const [schaeden, setSch] = useState("0");
+  const [bauverzug, setBvz] = useState("0");
+  const [bwv, setBwv] = useState("0.40");
+  const [bwasser, setBws] = useState("3.00");
+  const [sicherheit, setSich] = useState("0.00");
+  const [extraAbz, setExt] = useState([]);
+  const [prevRN, setPrev] = useState([{
+    label: "",
+    amount: ""
+  }]);
+  const [skonto, setSkonto] = useState("3");
+  const [skontoTage, setSkontoTage] = useState("8");
+  const [skontoDate, setSkontoDate] = useState("");
+  const [bast, setBast] = useState("15");
+  const [nachweise, setNw] = useState([{
+    label: "Gewerbeanmeldung",
+    val: "vorhanden"
+  }, {
+    label: "Eintragungsnachweis Gewerbezentralregister",
+    val: "-"
+  }, {
+    label: "Freistellungsbescheinigung Finanzamt DE",
+    val: ""
+  }, {
+    label: "Kopie PA je eingesetzter Mitarbeiter",
+    val: "-"
+  }, {
+    label: "Kopie Krankenversicherungskarte je eingesetzter Mitarbeiter",
+    val: "-"
+  }, {
+    label: "A1-Bescheinigung je eingesetztem Mitarbeiter",
+    val: "-"
+  }, {
+    label: "Bestätigung Mindestlohn",
+    val: "-"
+  }, {
+    label: "Haftpflichtversicherung mit Haftung DE",
+    val: "-"
+  }, {
+    label: "Unbedenklichkeit Krankenkasse",
+    val: "-"
+  }, {
+    label: "Unbedenklichkeit BG Bau",
+    val: "-"
+  }, {
+    label: "Nachweis Mitgliedschaft SOKA",
+    val: "-"
+  }, {
+    label: "Anmeldung ZOLL, Liste Mitarbeiter / Baustelle",
+    val: "-"
+  }]);
+  const pct = (base, p) => base * (parseFloat(p) || 0) / 100;
+  const netto = parseFloat(rnNetto) || 0;
+  const abzugSum = pct(netto, maengel) + pct(netto, nachtraege) + pct(netto, restl) + pct(netto, schaeden) + pct(netto, bauverzug);
+  const afterAbzug = netto - abzugSum;
+  const bwvAmt = pct(afterAbzug, bwv);
+  const bwsAmt = pct(afterAbzug, bwasser);
+  const sichAmt = pct(afterAbzug, sicherheit);
+  const extraAmt = extraAbz.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+  const rechnungsbetrag = afterAbzug - bwvAmt - bwsAmt - sichAmt - extraAmt;
+  const prevSum = prevRN.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+  const rnBetrag = rechnungsbetrag - prevSum;
+  const skontoAmt = rnBetrag * (parseFloat(skonto) || 0) / 100;
+  const zahlungsbetrag = rnBetrag - skontoAmt;
+  const bastMitSkonto = zahlungsbetrag * (parseFloat(bast) || 0) / 100;
+  const bastOhneSkonto = rnBetrag * (parseFloat(bast) || 0) / 100;
+  const printRL = () => {
+    const CSS = `*{font-family:Arial,sans-serif;font-size:10pt;box-sizing:border-box;margin:0;padding:0;color:#111}
+body{background:#fff}
+.ph{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:1pt solid #888}
+.ph-top{display:flex;justify-content:space-between;align-items:flex-start;padding:6mm 18mm 3mm}
+.tw-logo{display:flex;align-items:baseline;gap:2px}
+.tw-t{font-size:26pt;font-weight:900;font-style:italic;line-height:1}
+.tw-w{font-size:18pt;font-weight:900;font-style:italic;line-height:1}
+.tw-name{font-size:12pt;font-weight:bold;margin-left:6px;line-height:1.3}
+.ph-right{text-align:right;font-size:8pt;line-height:1.65;color:#333}
+.pf{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:3mm 18mm;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0 6mm;font-size:7.5pt;color:#333;line-height:1.6}
+.ct{margin-top:42mm;margin-bottom:22mm;padding:0 18mm}
+.row2{display:grid;grid-template-columns:120px auto;gap:3px 14px;font-size:9.5pt;margin-bottom:5mm;line-height:1.7}
+.row2 .k{color:#333}
+table.rl{width:100%;border-collapse:collapse;margin-bottom:6mm;font-size:9.5pt}
+table.rl td{padding:3px 7px;line-height:1.6}
+table.rl .val{text-align:right;white-space:nowrap}
+table.rl .pct{text-align:right;color:#555;width:55px}
+table.rl .sep td{border-top:0.5pt solid #bbb}
+table.rl .bold td{font-weight:bold}
+table.rl .finbold td{border-top:1.5pt solid #111;border-bottom:1.5pt solid #111;font-weight:bold;font-size:11pt;padding:5px 7px}
+table.rl .underline td{text-decoration:underline;font-weight:bold}
+table.nw{width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:5mm}
+table.nw td{padding:2px 7px;border-bottom:0.5pt solid #eee}
+table.nw .head td{font-weight:bold;border-bottom:1pt solid #333;text-decoration:underline}
+.vob{font-size:8.5pt;color:#333;margin-top:6mm;line-height:1.55}
+@media print{@page{size:A4;margin:0}body{width:210mm}.ph{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+    const hdr = "<div class='ph'><div class='ph-top'>" + "<div><div class='tw-logo'><span class='tw-t'>T</span><span class='tw-w'>w</span><span class='tw-name'>Trockenbau - Akustik - Meisterbetrieb</span></div>" + "<div style='font-size:8pt;color:#555;margin-top:2px'>" + co.name + " &middot; " + co.street + " &middot; " + co.zip + " " + co.city + "</div></div>" + "<div class='ph-right'>Dachgeschossausbau<br>Trennwände &middot; Fußböden<br>Unterhangdecken &middot; Brandschutz<br>WC - Trennwände &middot; Türen<br>" + co.website + "</div>" + "</div></div>";
+    const ftr = "<div class='pf'>" + "<div><strong>" + co.name + "</strong><br>" + co.street + "<br>" + co.zip + " " + co.city + "</div>" + "<div>Geschäftsführer: " + co.manager + "<br>Sitz: " + co.city + "<br>" + co.hrb + "<br>St.-Nr.: " + co.stNr + "</div>" + "<div>" + co.bank + "<br>BIC " + co.bic + "<br>IBAN " + co.iban + "</div>" + "<div style='text-align:right;align-self:center'>Seite 1 von 1</div></div>";
+    const E = n => n.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " EUR";
+    const P = p => (parseFloat(p) || 0).toFixed(2) + "%";
+    const html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Rücklauf " + rnNum + "</title><style>" + CSS + "</style></head><body>" + hdr + ftr + "<div class='ct'>" + "<h2 style='font-size:18pt;font-weight:bold;margin-bottom:3mm'>Rücklauf zur Rechnung</h2>" + "<div style='font-size:9.5pt;color:#555;margin-bottom:7mm'>" + rnNum + " vom " + rnDate + " E: " + rnEin + "</div>" + "<div class='row2'>" + "<span class='k'>Auftragnehmer</span><span><strong>" + subName + "</strong><br>" + subAddr + "</span>" + "<span class='k'>Baustelle</span><span>" + baustelle + "</span>" + "</div>" + "<table class='rl'>" + "<tr><td>Rechnung</td><td><strong>" + rnType + "</strong></td><td class='pct'></td><td class='val'>netto</td><td class='val'>" + E(netto) + "</td></tr>" + "<tr><td>Mängel</td><td></td><td class='pct'>" + P(maengel) + "</td><td class='val'></td><td class='val'>" + E(-pct(netto, maengel)) + "</td></tr>" + "<tr><td>Nachträge</td><td></td><td class='pct'>" + P(nachtraege) + "</td><td class='val'></td><td class='val'>" + E(-pct(netto, nachtraege)) + "</td></tr>" + "<tr><td>Restleistungen</td><td></td><td class='pct'>" + P(restl) + "</td><td class='val'></td><td class='val'>" + E(-pct(netto, restl)) + "</td></tr>" + "<tr><td>Schäden</td><td></td><td class='pct'>" + P(schaeden) + "</td><td class='val'></td><td class='val'>" + E(-pct(netto, schaeden)) + "</td></tr>" + "<tr><td>Bauverzug</td><td></td><td class='pct'>" + P(bauverzug) + "</td><td class='val'></td><td class='val'>" + E(-pct(netto, bauverzug)) + "</td></tr>" + "<tr class='sep bold'><td colspan='4'></td><td class='val'>" + E(afterAbzug) + "</td></tr>" + "<tr><td colspan='5' style='height:4mm'></td></tr>" + "<tr><td>Bauwesenversicherung</td><td></td><td class='pct'>" + P(bwv) + "</td><td class='val'></td><td class='val'>" + E(-bwvAmt) + "</td></tr>" + "<tr><td>Bauwasser, Strom, Müll</td><td></td><td class='pct'>" + P(bwasser) + "</td><td class='val'></td><td class='val'>" + E(-bwsAmt) + "</td></tr>" + "<tr><td>Sicherheits-/ Gewährleistungseinbehalt</td><td></td><td class='pct'>" + P(sicherheit) + "</td><td class='val'></td><td class='val'>" + E(-sichAmt) + "</td></tr>" + extraAbz.map(e => "<tr><td>" + e.label + "</td><td></td><td class='pct'>" + P(e.pct) + "</td><td class='val'></td><td class='val'>" + E(-(parseFloat(e.amount) || 0)) + "</td></tr>").join("") + "<tr class='bold'><td colspan='3'>Rechnungsbetrag</td><td></td><td class='val'>" + E(rechnungsbetrag) + "</td></tr>" + prevRN.filter(r => r.label).map(r => "<tr><td>" + r.label + "</td><td></td><td></td><td></td><td class='val'>" + E(-parseFloat(r.amount || 0)) + "</td></tr>").join("") + "<tr class='sep'><td colspan='5' style='height:2mm'></td></tr>" + "<tr class='bold'><td colspan='3'>Rechnungsbetrag</td><td></td><td class='val'>" + E(rnBetrag) + "</td></tr>" + "<tr><td>Skonto " + skonto + " % / " + skontoTage + " Arbeitstage</td><td></td><td>bis</td><td>" + skontoDate + "</td><td class='val'>" + E(-skontoAmt) + "</td></tr>" + "<tr class='sep finbold'><td colspan='3'>Zahlungsbetrag</td><td></td><td class='val'>" + E(zahlungsbetrag) + "</td></tr>" + "<tr><td colspan='5' style='height:4mm'></td></tr>" + "<tr><td colspan='3'>Bauabzugsteuer BASt " + bast + "% nach EStG §48 Abs.1 Satz 1 mit Skonto</td><td></td><td class='val'>" + E(bastMitSkonto) + "</td></tr>" + "<tr><td colspan='3'>Bauabzugsteuer BASt " + bast + "% nach EStG §48 Abs.1 Satz 1 ohne Skonto</td><td></td><td class='val'>" + E(bastOhneSkonto) + "</td></tr>" + "</table>" + "<div style='font-size:9.5pt;font-weight:bold;margin-bottom:3mm'>Rechnungsfreigabe vorbehaltlich etwaiger Nachprüfung!</div>" + "<table class='nw'>" + "<tr class='head'><td>Nachweis entspr. Besondere Vertragsbedingungen</td><td style='text-align:right'>Gültig bis</td></tr>" + nachweise.map(n => "<tr><td>" + n.label + "</td><td style='text-align:right'>" + n.val + "</td></tr>").join("") + "</table>" + "<div class='vob'>Wir weisen Sie auf die VOB Teil B § 16 Nr. 3 Absatz 5 in Verbindung mit Absatz 2 hin. Ein Vorbehalt ist innerhalb von 24 Werktagen nach Zugang der Mitteilung nach Absatz 2 und 3 über die Schlußzahlung zu erklären. Er wird hinfällig, wenn nicht innerhalb von weiteren 24 Werktagen eine prüfbare Rechnung über die vorbehaltenen Forderungen eingereicht oder, wenn das nicht möglich ist, der Vorbehalt eingehend begründet wird.</div>" + "</div></body></html>";
+    const w = window.open("", "_blank");
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => w.print(), 500);
+  };
+  const F = (label, el) => /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, label), el);
+  const pctRow = (label, state, setter, showExtra = false) => /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      alignItems: "center",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1,
+      fontSize: "13px"
+    }
+  }, label), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: state,
+    onChange: e => setter(e.target.value),
+    style: {
+      width: 70,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, "%"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 100,
+      textAlign: "right",
+      fontSize: "13px",
+      color: "#555"
+    }
+  }, state > 0 ? "- " : "", fmtE(pct(parseFloat(rnNetto) || 0, state))));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: "1rem"
+    }
+  }, "R\xFCcklauf erstellen"), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, F("Auftragnehmer (Name)", /*#__PURE__*/React.createElement("input", {
+    value: subName,
+    onChange: e => setSubN(e.target.value),
+    placeholder: "z.B. Tomasz Kleczkowski"
+  })), F("Adresse", /*#__PURE__*/React.createElement("input", {
+    value: subAddr,
+    onChange: e => setSubA(e.target.value),
+    placeholder: "Stra\xDFe, PLZ Stadt"
+  })), F("Baustelle", /*#__PURE__*/React.createElement("input", {
+    value: baustelle,
+    onChange: e => setBst(e.target.value),
+    placeholder: "z.B. Herbert-Thiele-Str., Leipzig"
+  })), F("Rechnungsnummer", /*#__PURE__*/React.createElement("input", {
+    value: rnNum,
+    onChange: e => setRnNum(e.target.value),
+    placeholder: "z.B. 16-2023"
+  })), F("Rechnungsdatum", /*#__PURE__*/React.createElement("input", {
+    value: rnDate,
+    onChange: e => setRnDate(e.target.value),
+    placeholder: "TT.MM.JJJJ"
+  })), F("Eingegangen am (E)", /*#__PURE__*/React.createElement("input", {
+    value: rnEin,
+    onChange: e => setRnEin(e.target.value),
+    placeholder: "TT.MM.JJJJ"
+  })), F("Rechnungstyp", /*#__PURE__*/React.createElement("select", {
+    value: rnType,
+    onChange: e => setRnType(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", null, "Schlussrechnung"), /*#__PURE__*/React.createElement("option", null, "Abschlagsrechnung"), /*#__PURE__*/React.createElement("option", null, "Rechnung"))), F("Nettobetrag (EUR)", /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: rnNetto,
+    onChange: e => setRnN(e.target.value),
+    placeholder: "0.00",
+    style: {
+      fontWeight: 600
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: "1rem"
+    }
+  }, "Abz\xFCge vom Rechnungsbetrag"), pctRow("Mängel", maengel, setMae), pctRow("Nachträge", nachtraege, setNtr), pctRow("Restleistungen", restl, setRest), pctRow("Schäden", schaeden, setSch), pctRow("Bauverzug", bauverzug, setBvz), /*#__PURE__*/React.createElement("hr", {
+    className: "sep",
+    style: {
+      margin: "10px 0"
+    }
+  }), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      marginBottom: 8
+    }
+  }, "Kosten / Einbehalte"), pctRow("Bauwesenversicherung", bwv, setBwv), pctRow("Bauwasser, Strom, Müll", bwasser, setBws), pctRow("Sicherheits-/ Gewährleistungseinbehalt", sicherheit, setSich), extraAbz.map((e, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 4,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: e.label,
+    onChange: v => setExt(x => x.map((r, j) => j === i ? {
+      ...r,
+      label: v.target.value
+    } : r)),
+    placeholder: "Bezeichnung",
+    style: {
+      flex: 2
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: e.pct,
+    onChange: v => setExt(x => x.map((r, j) => j === i ? {
+      ...r,
+      pct: v.target.value,
+      amount: String(pct(parseFloat(rnNetto) || 0, v.target.value))
+    } : r)),
+    placeholder: "%",
+    style: {
+      width: 65,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, "%"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 100,
+      textAlign: "right",
+      fontSize: "13px",
+      color: "#555"
+    }
+  }, "- ", fmtE(parseFloat(e.amount) || 0)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setExt(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "12px"
+    }
+  }, "x"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setExt(x => [...x, {
+      label: "",
+      pct: "0",
+      amount: "0"
+    }]),
+    style: {
+      fontSize: "12px",
+      padding: "4px 10px",
+      marginTop: 4
+    }
+  }, "+ weiterer Abzug"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      fontWeight: 600,
+      fontSize: "14px",
+      marginTop: 10,
+      paddingTop: 8,
+      borderTop: "1px solid #e5e7eb"
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Rechnungsbetrag"), /*#__PURE__*/React.createElement("span", null, fmtE(rechnungsbetrag)))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Abzug vorherige Rechnungen"), prevRN.map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 6,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: r.label,
+    onChange: e => setPrev(x => x.map((v, j) => j === i ? {
+      ...v,
+      label: e.target.value
+    } : v)),
+    placeholder: "z.B. RN 15-2023",
+    style: {
+      flex: 2
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.01",
+    value: r.amount,
+    onChange: e => setPrev(x => x.map((v, j) => j === i ? {
+      ...v,
+      amount: e.target.value
+    } : v)),
+    placeholder: "Betrag EUR",
+    style: {
+      flex: 1,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setPrev(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "12px"
+    }
+  }, "x"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setPrev(x => [...x, {
+      label: "",
+      amount: ""
+    }]),
+    style: {
+      fontSize: "12px",
+      padding: "4px 10px"
+    }
+  }, "+ weitere RN"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      fontWeight: 600,
+      marginTop: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Rechnungsbetrag nach Abzug"), /*#__PURE__*/React.createElement("span", null, fmtE(rnBetrag)))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Skonto & Zahlungsbetrag"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginBottom: 8,
+      flexWrap: "wrap",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "13px"
+    }
+  }, "Skonto"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "0.1",
+    value: skonto,
+    onChange: e => setSkonto(e.target.value),
+    style: {
+      width: 60,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, "%"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "13px"
+    }
+  }, "/"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: skontoTage,
+    onChange: e => setSkontoTage(e.target.value),
+    style: {
+      width: 50,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "13px"
+    }
+  }, "Arbeitstage bis"), /*#__PURE__*/React.createElement("input", {
+    value: skontoDate,
+    onChange: e => setSkontoDate(e.target.value),
+    placeholder: "TT.MM.JJJJ",
+    style: {
+      width: 110
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      fontWeight: 700,
+      fontSize: "16px",
+      borderTop: "2px solid #111",
+      paddingTop: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Zahlungsbetrag"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      textDecoration: "underline"
+    }
+  }, fmtE(zahlungsbetrag))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      fontSize: "13px",
+      color: "#555"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between"
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "BASt ", bast, "% mit Skonto:"), /*#__PURE__*/React.createElement("span", null, fmtE(bastMitSkonto))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between"
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "BASt ", bast, "% ohne Skonto:"), /*#__PURE__*/React.createElement("span", null, fmtE(bastOhneSkonto))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      alignItems: "center",
+      marginTop: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "BASt-Satz:"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    step: "1",
+    value: bast,
+    onChange: e => setBast(e.target.value),
+    style: {
+      width: 55,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", null, "%")))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Nachweisliste"), nachweise.map((n, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 4,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 3,
+      fontSize: "13px"
+    }
+  }, n.label), /*#__PURE__*/React.createElement("input", {
+    value: n.val,
+    onChange: e => setNw(x => x.map((v, j) => j === i ? {
+      ...v,
+      val: e.target.value
+    } : v)),
+    placeholder: "vorhanden / - / Datum",
+    style: {
+      flex: 1,
+      fontSize: "12px"
+    }
+  })))), /*#__PURE__*/React.createElement("button", {
+    onClick: printRL,
+    disabled: !subName || !rnNetto,
+    className: "btn-blue"
+  }, "R\xFCcklauf drucken / PDF \u2197"));
+}
+function Quote({
+  co,
+  projects
+}) {
+  var _bauleistung$;
+  const [pId, setPId] = useState("");
+  const [client, setCl] = useState("");
+  const [clientAddr, setClA] = useState("");
+  const [subject, setSubj] = useState("");
+  const [projAddr, setPAddr] = useState("");
+  const [vorleistung, setVorl] = useState([{
+    pos: "1",
+    desc: "Objektbesichtigung, Prüfung Bauleistung",
+    price: "200"
+  }, {
+    pos: "2",
+    desc: "Baustelleneinrichtung",
+    price: "150"
+  }]);
+  const [bauleistung, setBaul] = useState([{
+    pos: "3",
+    desc: "",
+    stunden: "",
+    rate: "58"
+  }]);
+  const [materialEst, setMatEst] = useState("");
+  const [matAufschlag, setMatAuf] = useState("18/10");
+  const [vorauszPct, setVPct] = useState("30");
+  const [gueltig, setGuel] = useState("2 Wochen");
+  const [ausfStart, setAusfStart] = useState("");
+  const [auftrBis, setAuftBis] = useState("");
+  const [hinweise, setHinw] = useState("Präzisierung Angebot nach Vororttermin\nAbrechnung Leistung inkl. bestellter Bauelemente bzw. geliefertem Material\nKlärung Ausführung-/ Planungsdetails durch Fachplaner Auftraggeber\nBauleistung ohne Haftung für event. Schäden Objekt / Einrichtung\nZahlung Rechnungen innerhalb 8 Tage nach Rechnungslegung per E-Mail");
+  const [result, setResult] = useState("");
+  const [loading, setLoad] = useState(false);
+  const addVorl = () => setVorl(x => [...x, {
+    pos: String(x.length + 1),
+    desc: "",
+    price: ""
+  }]);
+  const updV = (i, k, v) => setVorl(x => x.map((r, j) => j === i ? {
+    ...r,
+    [k]: v
+  } : r));
+  const addBaul = () => setBaul(x => [...x, {
+    pos: String(x.length + 1),
+    desc: "",
+    stunden: "",
+    rate: "58"
+  }]);
+  const updB = (i, k, v) => setBaul(x => x.map((r, j) => j === i ? {
+    ...r,
+    [k]: v
+  } : r));
+  const totalStd = bauleistung.reduce((s, b) => s + (parseFloat(b.stunden) || 0), 0);
+  const totalStdRate = bauleistung.reduce((s, b) => s + (parseFloat(b.stunden) || 0) * (parseFloat(b.rate) || 0), 0);
+  const matNum = parseFloat(materialEst) || 0;
+  const nettoGes = bauleistung.reduce((s, b) => s + parseFloat(b.price || 0) || 0, 0) + vorleistung.reduce((s, v) => s + (parseFloat(v.price) || 0), 0) + matNum;
+  const buildText = () => {
+    const vText = vorleistung.map(v => v.pos + " / " + v.desc + (v.price ? " / " + (parseFloat(v.price) || 0).toLocaleString("de-DE", {
+      minimumFractionDigits: 2
+    }) + " EUR" : "")).join("\n");
+    const bText = bauleistung.map(b => b.pos + (b.desc ? " / " + b.desc : "") + (b.stunden ? " / ca. " + b.stunden + " Std." : "")).join("\n");
+    const rateStr = bauleistung.length > 0 ? bauleistung[0].rate : 58;
+    const lines = ["Hiermit übersenden wir Ihnen entspr. Ihrer Angebotsanfrage nachstehendes Angebot.", "", "" + subject, "" + projAddr, "", "Vorleistung", "" + vText, "", "Bauleistung", "" + bText, totalStd > 0 ? "ca. " + totalStd + " Std. x " + rateStr + ",00 EUR / " + (totalStd * parseFloat(rateStr)).toLocaleString("de-DE", {
+      minimumFractionDigits: 2
+    }) + " EUR" + (materialEst ? " zzgl. ca. " + parseFloat(materialEst).toLocaleString("de-DE", {
+      minimumFractionDigits: 2
+    }) + " EUR Material, Entsorgung, Container" : "") : "", totalStd > 0 ? "Angebot ca. netto " + (totalStd * parseFloat(rateStr) + (parseFloat(materialEst) || 0)).toLocaleString("de-DE", {
+      minimumFractionDigits: 2
+    }) + " EUR zzgl. MwSt." : "", "", "Hinweise Angebot", hinweise, matAufschlag ? "Aufschlag Material, Entsorgung " + matAufschlag + " aufgrund günstiger Konditionen" : "", vorauszPct ? "Abrechnung " + vorauszPct + " Prozent vom Auftrag als fortlaufende Vorauszahlung" : "", auftrBis ? "Ausführung bei zeitnaher Auftragsbestätigung bis " + auftrBis + (ausfStart ? " ab ca. " + ausfStart : "") : "", "Angebot freibleibend, Gültigkeit " + gueltig + " ab Erstellungsdatum", "", "Wir bitten um entspr. Auftragsbestätigung und verbleiben", "mit bestem Dank im Voraus", "", co.manager + " | CEO", co.name, "Trockenbau-Akustik-Meisterbetrieb", co.street, co.zip + " " + co.city, "Funk " + co.mobile, "E-Mail: " + co.email];
+    return lines.filter(l => l !== null).join("\n");
+  };
+  const genAI = async () => {
+    setLoad(true);
+    setResult("");
+    try {
+      const t = buildText();
+      setResult(t);
+    } catch (e) {
+      setResult("Fehler.");
+    }
+    setLoad(false);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: ".5rem"
+    }
+  }, "Angebot erstellen"), /*#__PURE__*/React.createElement("div", {
+    className: "alert-blue",
+    style: {
+      marginBottom: "1rem",
+      fontSize: "12px"
+    }
+  }, "Format wie Ihre E-Mail-Angebote \u2014 wird als Text generiert zum Kopieren in E-Mail"), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Auftraggeber / Name"), /*#__PURE__*/React.createElement("input", {
+    value: client,
+    onChange: e => setCl(e.target.value),
+    placeholder: "z.B. Maria Fischer"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "E-Mail Auftraggeber (optional)"), /*#__PURE__*/React.createElement("input", {
+    value: clientAddr,
+    onChange: e => setClA(e.target.value),
+    placeholder: "max@beispiel.de"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Projektadresse"), /*#__PURE__*/React.createElement("input", {
+    value: projAddr,
+    onChange: e => setPAddr(e.target.value),
+    placeholder: "z.B. Steyberweg 61, 04129 Leipzig"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Betreff / Leistungsart"), /*#__PURE__*/React.createElement("input", {
+    value: subject,
+    onChange: e => setSubj(e.target.value),
+    placeholder: "z.B. Wandverkleidung K\xFCche"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Vorleistung"), vorleistung.map((v, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 6,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: v.pos,
+    onChange: e => updV(i, "pos", e.target.value),
+    style: {
+      width: 36,
+      textAlign: "center",
+      padding: "6px"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    value: v.desc,
+    onChange: e => updV(i, "desc", e.target.value),
+    placeholder: "Beschreibung",
+    style: {
+      flex: 3
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: v.price,
+    onChange: e => updV(i, "price", e.target.value),
+    placeholder: "EUR",
+    style: {
+      width: 90,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af"
+    }
+  }, "EUR"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setVorl(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "12px"
+    }
+  }, "x"))), /*#__PURE__*/React.createElement("button", {
+    onClick: addVorl,
+    style: {
+      fontSize: "12px",
+      padding: "4px 10px"
+    }
+  }, "+ Vorleistung")), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Bauleistung (Regiepositionen)"), bauleistung.map((b, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 6,
+      alignItems: "center",
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: b.pos,
+    onChange: e => updB(i, "pos", e.target.value),
+    style: {
+      width: 36,
+      textAlign: "center",
+      padding: "6px"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    value: b.desc,
+    onChange: e => updB(i, "desc", e.target.value),
+    placeholder: "Beschreibung / T\xE4tigkeit",
+    style: {
+      flex: 3,
+      minWidth: 150
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: b.stunden,
+    onChange: e => updB(i, "stunden", e.target.value),
+    placeholder: "Std.",
+    style: {
+      width: 70,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af"
+    }
+  }, "Std. x"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: b.rate,
+    onChange: e => updB(i, "rate", e.target.value),
+    style: {
+      width: 65,
+      textAlign: "right"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af"
+    }
+  }, "EUR/h"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setBaul(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "12px"
+    }
+  }, "x"))), /*#__PURE__*/React.createElement("button", {
+    onClick: addBaul,
+    style: {
+      fontSize: "12px",
+      padding: "4px 10px"
+    }
+  }, "+ Position"), totalStd > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      fontSize: "13px",
+      color: "#555",
+      paddingTop: 6,
+      borderTop: "1px solid #e5e7eb"
+    }
+  }, "Gesamt: ", totalStd, " Std. x ", ((_bauleistung$ = bauleistung[0]) === null || _bauleistung$ === void 0 ? void 0 : _bauleistung$.rate) || 58, " EUR/h = ", /*#__PURE__*/React.createElement("strong", null, fmtE(totalStdRate)))), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Material, Entsorgung ca. (EUR netto)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: materialEst,
+    onChange: e => setMatEst(e.target.value),
+    placeholder: "z.B. 700"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Aufschlag Material"), /*#__PURE__*/React.createElement("input", {
+    value: matAufschlag,
+    onChange: e => setMatAuf(e.target.value),
+    placeholder: "z.B. 18/10"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Vorauszahlung (%)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: vorauszPct,
+    onChange: e => setVPct(e.target.value),
+    placeholder: "30"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "G\xFCltigkeit Angebot"), /*#__PURE__*/React.createElement("input", {
+    value: gueltig,
+    onChange: e => setGuel(e.target.value),
+    placeholder: "2 Wochen"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Auftragsbest\xE4tigung bis"), /*#__PURE__*/React.createElement("input", {
+    value: auftrBis,
+    onChange: e => setAuftBis(e.target.value),
+    placeholder: "TT.MM.JJJJ"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Ausf\xFChrung ab ca."), /*#__PURE__*/React.createElement("input", {
+    value: ausfStart,
+    onChange: e => setAusfStart(e.target.value),
+    placeholder: "TT.MM.JJJJ"
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Hinweise Angebot (bearbeitbar)"), /*#__PURE__*/React.createElement("textarea", {
+    value: hinweise,
+    onChange: e => setHinw(e.target.value),
+    rows: 6,
+    style: {
+      resize: "vertical"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginBottom: "1.25rem",
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: genAI,
+    disabled: !subject
+  }, "Angebotstext generieren"), result && /*#__PURE__*/React.createElement("button", {
+    onClick: () => navigator.clipboard.writeText(result)
+  }, "Kopieren")), result && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Text f\xFCr E-Mail (direkt bearbeitbar)"), /*#__PURE__*/React.createElement("textarea", {
+    value: result,
+    onChange: e => setResult(e.target.value),
+    rows: 20,
+    style: {
+      width: "100%",
+      fontFamily: "monospace",
+      fontSize: "12.5px",
+      lineHeight: 1.7,
+      resize: "vertical",
+      background: "#f9fafb",
+      border: "1px solid #e5e7eb",
+      borderRadius: 10,
+      padding: 14
+    }
+  })));
+}
+function Report({
+  entries,
+  projects,
+  co
+}) {
+  const [pId, setPId] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState(toDay());
+  const [clientName, setClN] = useState("");
+  const [clientEmail, setClE] = useState("");
+  const [projAddr, setPAddr] = useState("");
+  const [subject, setSubj] = useState("");
+  const [extraItems, setExtra] = useState([]);
+  const [offenLeistungen, setOffen] = useState("");
+  const [hinweise, setHinw] = useState("Auflistung Regienachweis ohne Anspruch Vollständigkeit\nLeistungen fachgerecht, erforderlich ausgeführt; Dokumentation liegt vor\nEinwände Regienachweis schriftlich innerhalb 5 Werktagen nach Zugang\nOhne Rückmeldung, Inhaltliche Zustimmung, Inhalte gelten als anerkannt\nBestätigung kurzfristig zur Vermeidung Unterbrechung Arbeiten");
+  const [loading, setLoad] = useState(false);
+  const [result, setResult] = useState("");
+  const filt = entries.filter(e => (!pId || e.projectId === pId) && (!from || e.date >= from) && (!to || e.date <= to)).sort((a, b) => a.date.localeCompare(b.date));
+  const proj = projects.find(p => p.id === pId);
+  const totalH = filt.reduce((s, e) => s + e.hours, 0);
+
+  // Group entries by date
+  const byDate = {};
+  filt.forEach(e => {
+    if (!byDate[e.date]) byDate[e.date] = [];
+    byDate[e.date].push(e);
+  });
+  const buildText = () => {
+    const dateLines = Object.keys(byDate).sort().map(d => {
+      const es = byDate[d];
+      const totalDH = es.reduce((s, e) => s + e.hours, 0);
+      const desc = es.map(e => {
+        var _e$acts2;
+        return e.voiceDe || e.voice || ((_e$acts2 = e.acts) === null || _e$acts2 === void 0 ? void 0 : _e$acts2.join(", ")) || "";
+      }).filter(Boolean).join("; ");
+      return fmtD(d) + " / " + desc + (desc ? " / " : "") + totalDH + " h";
+    }).join("\n");
+    const matLines = extraItems.map(m => m.desc).filter(Boolean).join("\n");
+    const lines = ["Leistungstand > Infos / Hinweise", subject || (proj === null || proj === void 0 ? void 0 : proj.name) || "", projAddr || (proj === null || proj === void 0 ? void 0 : proj.address) || "", "", "Vorleistung", "1 / Objektbesichtigung, Prüfung Bauleistung / ausgeführt", "2 / Baustelleneinrichtung / ausgeführt", "", "Regieleistung", dateLines, "Gesamt " + totalH + " Std.", "", "Material, Entsorgung", ...(matLines ? [matLines] : []), "", ...(offenLeistungen ? ["Noch offene Leistungen", offenLeistungen, ""] : []), "Infos / Hinweise", hinweise, "", "Wir bitten um entspr. Berücksichtigung und verbleiben", "mit bestem Dank im Voraus", "", co.manager + " | CEO", co.name, "Trockenbau-Akustik-Meisterbetrieb", co.street, co.zip + " " + co.city, "Funk " + co.mobile, "E-Mail: " + co.email];
+    return lines.join("\n");
+  };
+  const gen = () => {
+    setResult(buildText());
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: ".5rem"
+    }
+  }, "Leistungsnachweis / Regiebericht"), /*#__PURE__*/React.createElement("div", {
+    className: "alert-blue",
+    style: {
+      marginBottom: "1rem",
+      fontSize: "12px"
+    }
+  }, "Format wie Ihre E-Mail-Leistungsnachweise \u2014 wird als Text generiert zum Kopieren in E-Mail"), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Baustelle"), /*#__PURE__*/React.createElement("select", {
+    value: pId,
+    onChange: e => setPId(e.target.value)
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Alle"), projects.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id,
+    value: p.id
+  }, p.name)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Empf\xE4nger / Auftraggeber"), /*#__PURE__*/React.createElement("input", {
+    value: clientName,
+    onChange: e => setClN(e.target.value),
+    placeholder: "z.B. Maria Fischer"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "E-Mail Empf\xE4nger"), /*#__PURE__*/React.createElement("input", {
+    value: clientEmail,
+    onChange: e => setClE(e.target.value),
+    placeholder: "max@beispiel.de"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Projektadresse"), /*#__PURE__*/React.createElement("input", {
+    value: projAddr,
+    onChange: e => setPAddr(e.target.value),
+    placeholder: "Stra\xDFe, PLZ Ort"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Betreff / Leistungsart"), /*#__PURE__*/React.createElement("input", {
+    value: subject,
+    onChange: e => setSubj(e.target.value),
+    placeholder: "z.B. Wandverkleidung K\xFCche"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Von"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: from,
+    onChange: e => setFrom(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Bis"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: to,
+    onChange: e => setTo(e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem",
+      fontSize: "13px",
+      color: "#6b7280"
+    }
+  }, filt.length, " Eintr\xE4ge \xB7 ", totalH, " Stunden \xB7 ", filt.filter(e => e.voice || e.voiceDe).length, " mit Sprachnotiz"), filt.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "13px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Erfasste Regieleistungen (Vorschau)"), Object.keys(byDate).sort().map(d => /*#__PURE__*/React.createElement("div", {
+    key: d,
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 600,
+      fontSize: "13px"
+    }
+  }, fmtD(d)), byDate[d].map(e => /*#__PURE__*/React.createElement("div", {
+    key: e.id,
+    style: {
+      fontSize: "12px",
+      color: "#555",
+      marginLeft: 12,
+      marginTop: 2
+    }
+  }, e.workerName, " \u2014 ", e.hours, "h", e.voiceDe || e.voice ? " — " + (e.voiceDe || e.voice).slice(0, 70) : ""))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Material, Entsorgung (eine Zeile pro Position)"), extraItems.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: m.desc,
+    onChange: e => setExtra(x => x.map((v, j) => j === i ? {
+      ...v,
+      desc: e.target.value
+    } : v)),
+    placeholder: "z.B. Lieferscheine Hornbach lt. Anlage",
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setExtra(x => x.filter((_, j) => j !== i)),
+    style: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: "#9ca3af",
+      fontSize: "12px"
+    }
+  }, "x"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setExtra(x => [...x, {
+      desc: ""
+    }]),
+    style: {
+      fontSize: "12px",
+      padding: "4px 10px"
+    }
+  }, "+ Position")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Noch offene Leistungen (optional)"), /*#__PURE__*/React.createElement("textarea", {
+    value: offenLeistungen,
+    onChange: e => setOffen(e.target.value),
+    rows: 2,
+    placeholder: "z.B. Lieferung, Einbau Schiebet\xFCr / ca. 8 Std.",
+    style: {
+      resize: "vertical"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: "1rem"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Infos / Hinweise (bearbeitbar)"), /*#__PURE__*/React.createElement("textarea", {
+    value: hinweise,
+    onChange: e => setHinw(e.target.value),
+    rows: 6,
+    style: {
+      resize: "vertical"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      marginBottom: "1.25rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-green",
+    onClick: gen
+  }, "Leistungsnachweis generieren"), result && /*#__PURE__*/React.createElement("button", {
+    onClick: () => navigator.clipboard.writeText(result)
+  }, "Kopieren")), result && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, "Text f\xFCr E-Mail (direkt bearbeitbar)"), /*#__PURE__*/React.createElement("textarea", {
+    value: result,
+    onChange: e => setResult(e.target.value),
+    rows: 22,
+    style: {
+      width: "100%",
+      fontFamily: "monospace",
+      fontSize: "12.5px",
+      lineHeight: 1.7,
+      resize: "vertical",
+      background: "#f9fafb",
+      border: "1px solid #e5e7eb",
+      borderRadius: 10,
+      padding: 14
+    }
+  })));
+}
+function Settings({
+  workers,
+  projects,
+  sw,
+  sp,
+  pin,
+  sPin,
+  co,
+  sCo
+}) {
+  const [nw, setNw] = useState("");
+  const [np, setNp] = useState({
+    name: "",
+    client: "",
+    address: "",
+    trade: "Trockenbau"
+  });
+  const [newPin, setNPin] = useState("");
+  const [pinOk, setPinOk] = useState(false);
+  const [coF, setCoF] = useState({
+    ...co
+  });
+  const [coOk, setCoOk] = useState(false);
+  const addW = async () => {
+    if (!nw.trim()) return;
+    await sw([...workers, {
+      id: uid(),
+      name: nw.trim()
+    }]);
+    setNw("");
+  };
+  const addP = async () => {
+    if (!np.name.trim()) return;
+    await sp([...projects, {
+      id: uid(),
+      ...np
+    }]);
+    setNp({
+      name: "",
+      client: "",
+      address: "",
+      trade: "Trockenbau"
+    });
+  };
+  const savePin = async () => {
+    if (!newPin.trim()) return;
+    await sPin(newPin);
+    setNPin("");
+    setPinOk(true);
+    setTimeout(() => setPinOk(false), 2000);
+  };
+  const saveCo = async () => {
+    await sCo(coF);
+    setCoOk(true);
+    setTimeout(() => setCoOk(false), 2000);
+  };
+  const CO_F = [["name", "Firmenname"], ["header", "Briefkopf / Header"], ["street", "Straße"], ["zip", "PLZ"], ["city", "Stadt"], ["phone", "Telefon"], ["mobile", "Mobil"], ["email", "E-Mail"], ["website", "Website"], ["manager", "Geschäftsführer"], ["hrb", "HRB"], ["stNr", "Steuernummer"], ["bank", "Bank"], ["bic", "BIC"], ["iban", "IBAN"]];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "17px",
+      fontWeight: 700,
+      marginBottom: "1.25rem"
+    }
+  }, "Einstellungen"), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Unternehmensdaten"), /*#__PURE__*/React.createElement("div", {
+    className: "grid-auto",
+    style: {
+      marginBottom: 12
+    }
+  }, CO_F.map(([k, l]) => /*#__PURE__*/React.createElement("div", {
+    key: k
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "lbl"
+  }, l), /*#__PURE__*/React.createElement("input", {
+    value: coF[k] || "",
+    onChange: e => setCoF(c => ({
+      ...c,
+      [k]: e.target.value
+    }))
+  })))), /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: saveCo,
+    style: {
+      marginBottom: "1.5rem"
+    }
+  }, coOk ? "Gespeichert ✓" : "Unternehmensdaten speichern"), /*#__PURE__*/React.createElement("hr", {
+    className: "sep"
+  }), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Mitarbeiter"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: nw,
+    onChange: e => setNw(e.target.value),
+    onKeyDown: e => e.key === "Enter" && addW(),
+    placeholder: "Name eingeben",
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: addW,
+    disabled: !nw.trim(),
+    style: {
+      whiteSpace: "nowrap"
+    }
+  }, "+ Hinzuf\xFCgen")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 6,
+      marginBottom: "1.5rem"
+    }
+  }, workers.map(w => /*#__PURE__*/React.createElement("div", {
+    key: w.id,
+    className: "card",
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: ".75rem 1rem"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 500
+    }
+  }, w.name), /*#__PURE__*/React.createElement("button", {
+    onClick: () => sw(workers.filter(x => x.id !== w.id)),
+    style: {
+      background: "none",
+      border: "none",
+      color: "#dc2626",
+      cursor: "pointer",
+      fontSize: "13px"
+    }
+  }, "entfernen")))), /*#__PURE__*/React.createElement("hr", {
+    className: "sep"
+  }), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "Baustellen"), /*#__PURE__*/React.createElement("div", {
+    className: "grid2",
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: np.name,
+    onChange: e => setNp(p => ({
+      ...p,
+      name: e.target.value
+    })),
+    placeholder: "Projektname *",
+    style: {
+      gridColumn: "1/-1"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    value: np.client,
+    onChange: e => setNp(p => ({
+      ...p,
+      client: e.target.value
+    })),
+    placeholder: "Auftraggeber"
+  }), /*#__PURE__*/React.createElement("input", {
+    value: np.address,
+    onChange: e => setNp(p => ({
+      ...p,
+      address: e.target.value
+    })),
+    placeholder: "Adresse"
+  }), /*#__PURE__*/React.createElement("input", {
+    value: np.trade,
+    onChange: e => setNp(p => ({
+      ...p,
+      trade: e.target.value
+    })),
+    placeholder: "Gewerk",
+    style: {
+      gridColumn: "1/-1"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: np.fahrzeit || "",
+    onChange: e => setNp(p => ({
+      ...p,
+      fahrzeit: e.target.value
+    })),
+    placeholder: "An- & Abfahrt (Stunden gesamt, z.B. 0.5)",
+    style: {
+      gridColumn: "1/-1"
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: addP,
+    disabled: !np.name.trim(),
+    style: {
+      marginBottom: 10
+    }
+  }, "+ Baustelle hinzuf\xFCgen"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 6,
+      marginBottom: "1.5rem"
+    }
+  }, projects.map(p => /*#__PURE__*/React.createElement("div", {
+    key: p.id,
+    className: "card",
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: ".75rem 1rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      fontSize: "14px"
+    }
+  }, p.name), p.client && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280"
+    }
+  }, p.client, p.address ? " · " + p.address : ""), p.fahrzeit && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "11px",
+      color: "#9ca3af"
+    }
+  }, "An-/Abfahrt: ", p.fahrzeit, " Std.")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => sp(projects.filter(x => x.id !== p.id)),
+    style: {
+      background: "none",
+      border: "none",
+      color: "#dc2626",
+      cursor: "pointer",
+      fontSize: "13px"
+    }
+  }, "entfernen")))), /*#__PURE__*/React.createElement("hr", {
+    className: "sep"
+  }), /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: "14px",
+      fontWeight: 600,
+      marginBottom: ".75rem"
+    }
+  }, "PIN f\xFCr Unternehmensportal"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "12px",
+      color: "#6b7280",
+      marginBottom: ".75rem"
+    }
+  }, "Aktuell: ", "•".repeat(pin.length)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    value: newPin,
+    onChange: e => setNPin(e.target.value),
+    placeholder: "Neuer PIN",
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-blue",
+    onClick: savePin,
+    disabled: !newPin.trim(),
+    style: {
+      whiteSpace: "nowrap"
+    }
+  }, pinOk ? "Gespeichert ✓" : "Speichern")));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
+</script>
+</body>
+</html>
